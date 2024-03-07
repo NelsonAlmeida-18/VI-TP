@@ -34,7 +34,7 @@ public:
     }
     // note that methods declared within the class are inline by default
     inline float norm () {
-        return std::sqrtf(X*X+Y*Y+Z*Z);
+        return std::sqrt(X*X+Y*Y+Z*Z);
     }
     inline void normalize () {
         const float my_norm = norm();

@@ -7,6 +7,7 @@
 
 #include "mesh.hpp"
 #include <vector>
+#include <limits>
 
 // see pbrt book (3rd ed.), sec 3.6.2, pag 157
 //

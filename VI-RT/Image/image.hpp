@@ -8,6 +8,7 @@
 #ifndef image_hpp
 #define image_hpp
 
+#include <cstring>
 #include "RGB.hpp"
 #include <string>
 

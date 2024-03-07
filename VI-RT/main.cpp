@@ -29,7 +29,7 @@ int main(int argc, const char * argv[]) {
     clock_t start, end;
     double cpu_time_used;
     
-    success = scene.Load("/Users/rkeat/Desktop/Universidade/1anoMestrado/2semestre/VI/VI-RT/VI-RT/utils/cornell-box.obj");
+    success = scene.Load("/home/gustavo/cg/VI-TP/VI-RT/utils/cornell-box.obj");
     
     if (!success) {
         std::cout << "ERROR!! :o\n";

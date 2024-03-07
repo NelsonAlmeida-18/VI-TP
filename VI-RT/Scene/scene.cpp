@@ -85,7 +85,7 @@ bool Scene::Load (const std::string &fname) {
     return true;
 }
 
-bool LoadObj(const std::string fname) {
+bool Scene::LoadObj(const std::string &fname) {
     ObjReader myObjReader;
     if (!myObjReader.ParseFromFile(fname)) 
         return false;
@@ -155,7 +155,7 @@ bool LoadObj(const std::string fname) {
     return true;
 }
 
-bool LoadMtl(const std::string fname) {
+bool Scene::LoadMtl(const std::string &fname) {
     ObjReader myObjReader;
     if (!myObjReader.ParseFromFile(fname)) 
         return false;

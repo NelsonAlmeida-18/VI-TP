@@ -5,6 +5,7 @@ BUILD    := ./build
 OBJ_DIR  := $(BUILD)/objects
 APP_DIR  := $(BUILD)/apps
 SHELL	 := /bin/bash
+ARGS    :=
 
 TARGET   := VI-RT
 
@@ -46,4 +47,5 @@ clean:
 	-@rm -rvf $(OBJ_DIR)/*
 	-@rm -rvf $(APP_DIR)/*
 
-
+run:
+	$(APP_DIR)/$(TARGET) $(ARGS)
