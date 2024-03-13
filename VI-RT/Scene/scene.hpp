@@ -28,13 +28,17 @@ public:
     bool Load (const std::string &fname);
     bool SetLights (void) { return true; };
     bool LoadObj(const std::string &fname);
-    bool LoadMtl(const std::string &fname);
     bool trace (Ray r, Intersection *isect);
     bool visibility (Ray s, const float maxL);
     void printSummary(void) {
         std::cout << "#primitives = " << numPrimitives << " ; ";
         std::cout << "#lights = " << numLights << " ; ";
         std::cout << "#materials = " << numBRDFs << " ;" << std::endl;
+    }
+
+    void addBRDF (BRDF *f) {
+        BRDFs.push_back(f);
+        numBRDFs++;
     }
 };
 

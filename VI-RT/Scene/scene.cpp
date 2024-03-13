@@ -12,11 +12,10 @@
 #include "primitive.hpp"
 #include "mesh.hpp"
 #include "Phong.hpp"
+#include "vector.hpp"
 
 #include <iostream>
 #include <set>
-#include <vector>
-#include <regex>
 
 using namespace tinyobj;
 
@@ -71,12 +70,6 @@ bool Scene::Load (const std::string &fname) {
             return false;
         }
     }
-    else if (fname.find(".mtl") != std::string::npos) {
-        // Load the .mtl file
-        if (!LoadMtl(fname)) {
-            return false;
-        }
-    }
     else {
         return false;
     }
@@ -85,83 +78,129 @@ bool Scene::Load (const std::string &fname) {
     return true;
 }
 
-bool Scene::LoadObj(const std::string &fname) {
-    ObjReader myObjReader;
-    if (!myObjReader.ParseFromFile(fname)) 
-        return false;
-    
-    const tinyobj::attrib_t attrib = myObjReader.GetAttrib();
-    // Obj structure:
-    // List of geometric vertices with x,y,z coordinates
-    // v x y z
-    // List of texture coordinates with u,[v,w] in [0 ... 1]
-    //vt u [v[w]]
-    // List of vertex normals with x,y,z coordinates
-    //vn x y z
-    // Which materials definition file to use
-    //mtllib [filename]
-    //wich material to use in the subsequent objets
-    //usemtl [material_name]
-    // group subsequent faces onto an object
-    //o [object_name]
-    //Polygonal face element f v1/vt1/vn1 v2/vt2/vn2 v3/vt3/vn3
-    //arguments are the vertices indices according to their order in the file
-    // f 1 2 4
-    // f 3/1 4/2 5/3
-    // f 6//3 2//1 7//2
 
-    //Lets start by identifying the regex of the file structure
-    std::regex vertex_pattern(R"(v\s+([\d\.-]+)\s+([\d\.-]+)\s+([\d\.-]+))");
-    std::regex texture_pattern(R"(vt\s+([\d\.-]+)\s+([\d\.-]+)\s*([\d\.-]+)?)");
-    std::regex normal_pattern(R"(vn\s+([\d\.-]+)\s+([\d\.-]+)\s+([\d\.-]+))");
-    std::regex material_pattern(R"(mtllib\s+([\w\.]+))");
-    std::regex usemtl_pattern(R"(usemtl\s+([\w]+))");
-    std::regex object_pattern(R"(o\s+([\w]+))");
-    std::regex face_pattern(R"(f\s+([\d]+)(?:/([\d]+))?(?:/([\d]+))?(\s+([\d]+)(?:/([\d]+))?(?:/([\d]+))?)(?:\s+([\d]+)(?:/([\d]+))?(?:/([\d]+))?)?)");
 
-    std::ifstream file(fname);
-    if (file.is_open()){
-        std::string line;
-        while (std::getline(file, line)){
-            std::smatch match;
-            if (std::regex_match(line, match, vertex_pattern)){
-                //std::cout << "Vertex: " << match[1] << " " << match[2] << " " << match[3] << std::endl;
-            }
-            else if (std::regex_match(line, match, texture_pattern)){
-                //std::cout << "Texture: " << match[1] << " " << match[2] << " " << match[3] << std::endl;
-            }
-            else if (std::regex_match(line, match, normal_pattern)){
-                //std::cout << "Normal: " << match[1] << " " << match[2] << " " << match[3] << std::endl;
-            }
-            else if (std::regex_match(line, match, material_pattern)){
-                //std::cout << "Material: " << match[1] << std::endl;
-            }
-            else if (std::regex_match(line, match, usemtl_pattern)){
-                //std::cout << "Usemtl: " << match[1] << std::endl;
-            }
-            else if (std::regex_match(line, match, object_pattern)){
-                //std::cout << "Object: " << match[1] << std::endl;
-            }
-            else if (std::regex_match(line, match, face_pattern)){
-                //std::cout << "Face: " << match[1] << " " << match[2] << " " << match[3] << std::endl;
-            }
+bool Scene::LoadObj(const std::string& fname) {
+
+    tinyobj::ObjReader reader;
+    int FaceID=0; 
+
+    if (!reader.ParseFromFile(fname)) {
+        if (!reader.Error().empty()) {
+            std::cerr << "TinyObjReader: " << reader.Error();
         }
-    }
-    else {
-        std::cerr << "Error: Could not open file " << fname << std::endl;
         return false;
     }
 
-    return true;
-}
+    if (!reader.Warning().empty()) {
+        std::cout << "TinyObjReader: " << reader.Warning();
+    }
 
-bool Scene::LoadMtl(const std::string &fname) {
-    ObjReader myObjReader;
-    if (!myObjReader.ParseFromFile(fname)) 
-        return false;
-    
-    const tinyobj::attrib_t attrib = myObjReader.GetAttrib();
-    
+    auto& attrib = reader.GetAttrib();
+    auto& shapes = reader.GetShapes();
+    auto& materials = reader.GetMaterials();
+
+    for(auto mat = materials.begin(); mat != materials.end(); mat++){
+        Phong *phong = new Phong();
+        phong->Ka.R = mat->ambient[0];
+        phong->Ka.G = mat->ambient[1];
+        phong->Ka.B = mat->ambient[2];
+        phong->Kd.R = mat->diffuse[0];
+        phong->Kd.G = mat->diffuse[1];
+        phong->Kd.B = mat->diffuse[2];
+        phong->Ks.R = mat->specular[0];
+        phong->Ks.G = mat->specular[1];
+        phong->Ks.B = mat->specular[2];
+        phong->Kt.R = mat->transmittance[0];
+        phong->Kt.G = mat->transmittance[1];
+        phong->Kt.B = mat->transmittance[2];
+        phong->Ns = mat->shininess;
+
+        // Each shape is one mesh
+        // Lets iterate over shapes/meshes
+        for (auto shape : shapes) {
+            Mesh *mesh = new Mesh();
+            Primitive *prim = new Primitive();
+            prim->g = mesh;
+            // Lets assume all faces in the mesh have the same material
+            prim->material_ndx = shape.mesh.material_ids[0];
+
+            // The primitives geomtry bounding box is calculated on the fly
+            const int V1st = shape.mesh.indices[0].vertex_index*3;
+            mesh->bb.min.set(attrib.vertices[V1st], attrib.vertices[V1st+1], attrib.vertices[V1st+2]);
+            mesh->bb.max.set(attrib.vertices[V1st], attrib.vertices[V1st+1], attrib.vertices[V1st+2]);
+
+            // Lets loop over all the faces and vertices
+            std::set<Point> vertices_rehash;
+            for (auto index : shape.mesh.indices) {
+                
+                Face *f = new Face();
+                Point myVtcs[3];
+
+                // We will process 3 vertices at a time
+                for (int i=0; i<3; i++) {
+                    const int Vndx = index.vertex_index*3;
+                    myVtcs[i].set(attrib.vertices[Vndx], attrib.vertices[Vndx+1], attrib.vertices[Vndx+2]);
+                    f->vert_ndx[i] = mesh->vertices.size();
+                    
+                    if (i==0){
+                        f->bb.min.set(myVtcs[0].X, myVtcs[0].Y, myVtcs[0].Z);
+                        f->bb.max.set(myVtcs[0].X, myVtcs[0].Y, myVtcs[0].Z);
+                    }else{
+                        f->bb.update(myVtcs[i]);
+                    }
+                    // Lets add the face to vertex
+                    // If the vertex is new then add it to the mesh
+                    // auto known_vert = vertices_rehash.find(myVtcs[i]);
+                    auto known_vert = vertices_rehash.find(myVtcs[i]);
+
+                    if(known_vert == vertices_rehash.end()){
+                        // New vertice add it to the mesh
+                        vertices_rehash.insert(myVtcs[i]);
+                        mesh->vertices.push_back(myVtcs[i]);
+                        mesh->numVertices++;
+                    }else{
+                        // Vertex already exists
+                        f->vert_ndx[i] = std::distance(vertices_rehash.begin(), known_vert);
+                    }
+                }
+                // add face to mesh and compute the geometric normal
+                Vector v1 = myVtcs[0].vec2point(myVtcs[1]);
+                Vector v2 = myVtcs[0].vec2point(myVtcs[2]);
+                
+                // TODO: Rever isto
+                f->edge1 = v1;
+                f->edge2 = v2;
+
+                Vector normal = v1.cross(v2);
+                normal.normalize();
+                f->geoNormal.set(normal);
+                f->FaceID = FaceID++;
+                mesh->faces.push_back(*f);
+                mesh->numFaces++;
+                
+                // // Lets calculate the primitives geometry bounding box
+                // const int Vndx = index.vertex_index*3;
+                // mesh->bb.min.set(std::min(mesh->bb.min.X, attrib.vertices[Vndx]), std::min(mesh->bb.min.Y, attrib.vertices[Vndx+1]), std::min(mesh->bb.min.Z, attrib.vertices[Vndx+2]));
+                // mesh->bb.max.set(std::max(mesh->bb.max.X, attrib.vertices[Vndx]), std::max(mesh->bb.max.Y, attrib.vertices[Vndx+1]), std::max(mesh->bb.max.Z, attrib.vertices[Vndx+2]));
+
+                // // Lets add the vertices to the mesh
+                // Point p(attrib.vertices[Vndx], attrib.vertices[Vndx+1], attrib.vertices[Vndx+2]);
+                // if (vertices_rehash.find(p) == vertices_rehash.end()) {
+                //     mesh->vertices.push_back(p);
+                //     vertices_rehash.insert(p);
+                // }
+            }
+            // Add primitives to the scene
+            prims.push_back(prim);
+            numPrimitives++;
+
+
+        }
+
+        BRDFs.push_back(phong);
+        numBRDFs++;
+    }
 
     return true;
 }
@@ -206,3 +245,4 @@ bool Scene::visibility (Ray s, const float maxL) {
     }
     return visible;
 }
+

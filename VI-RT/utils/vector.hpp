@@ -118,6 +118,12 @@ public:
     inline void set(float x, float y, float z) {
         X=x;Y=y;Z=z;
     }
+    bool operator<(const Point& other) const {
+        // Compare points based on their coordinates
+        if (X != other.X) return X < other.X;
+        if (Y != other.Y) return Y < other.Y;
+        return Z < other.Z;
+    }
     // note that methods declared within the class are inline by default
     inline Vector vec2point (Point p2) {
         Vector v(p2.X-X, p2.Y-Y, p2.Z-Z);
