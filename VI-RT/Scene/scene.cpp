@@ -169,8 +169,9 @@ bool Scene::LoadObj(const std::string& fname) {
                 Vector v2 = myVtcs[0].vec2point(myVtcs[2]);
                 
                 // TODO: Rever isto
-                f->edge1 = v1;
-                f->edge2 = v2;
+                // edge1 e edge2 estão na classe triangle.hpp, provavelmente temos de criar um triângulo com os 3 pontos que vamos buscar
+                // f->edge1 = v1;
+                // f->edge2 = v2;
 
                 Vector normal = v1.cross(v2);
                 normal.normalize();

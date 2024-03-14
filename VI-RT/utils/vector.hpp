@@ -94,7 +94,6 @@ public:
         vec.Z = X * Rx.Z + Y * Ry.Z + Z * Rz.Z;
         return vec;
     }
-
 };
 
 class Point {

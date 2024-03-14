@@ -16,26 +16,35 @@
 // Moller Trumbore intersection algorithm
 
 bool Mesh::TriangleIntersect (Ray r, Face f, Intersection *isect) {
-    
+
+    constexpr float epsilon = std::numeric_limits<float>::epsilon();
+
     if (!f.bb.intersect(r)) return false;
 
+    // Lets check if the ray is parallel to the triangle
+    // The ray is parallel to the triangle if the dot product of the ray direction and the 
+    // triangle normal is close to zero
+    // We will consider epsilon to be the baseline for this comparison
+    if (std::abs(r.dir.dot(f.geoNormal)) < epsilon) return false;
 
-    // Point a = f.vert_ndx[0];
-    // Point b = f.vert_ndx[1];
-    // Point c = f.vert_ndx[2];
-    
-    constexpr float epsilon = std::numeric_limits<float>::epsilon();
-    float triangle_x = isect->p.X;
-    float triangle_y = isect->p.Y;
-    float triangle_z = isect->p.Z;
-    
-    float edgea = triangle_y-triangle_x;
-    float edgeb = triangle_z-triangle_x;
-    
-    // Vector ray_cross_e2 = r.dir.cross(edgeb);
-    // float det = dot(edgea, ray_cross_e2);
-    
-    
+    //TODO: Rever isto
+    Point v0v1Aux = vertices[f.vert_ndx[1]] - vertices[f.vert_ndx[0]];
+    Vector v0v1(v0v1Aux.X, v0v1Aux.Y, v0v1Aux.Z);
+    Point v0v2Aux = vertices[f.vert_ndx[2]] - vertices[f.vert_ndx[0]];
+    Vector v0v2(v0v2Aux.X, v0v2Aux.Y, v0v2Aux.Z);
+    Vector pvec = r.dir.cross(v0v2);
+    float det = v0v1.dot(pvec);
+
+    float invDet = 1.0 / det;
+    auto aux = r.o - vertices[f.vert_ndx[0]];
+    Vector tvec(aux.X, aux.Y, aux.Z);
+    float u = tvec.dot(pvec) * invDet;
+    if (u < 0 || u > 1) return false;
+
+    Vector qvec = tvec.cross(v0v1);
+    float v = r.dir.dot(qvec) * invDet;
+    if (v < 0 || u + v > 1) return false;
+    float t = v0v2.dot(qvec) * invDet;
 
     return false;
 }

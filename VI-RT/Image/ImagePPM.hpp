@@ -10,9 +10,12 @@
 #include "image.hpp"
 
 class ImagePPM: public Image {
+    
     typedef struct {
         unsigned char val[3];  // r,g,b
     } PPM_pixel;
+
+
     PPM_pixel *imageToSave;
     void ToneMap ();
 public:

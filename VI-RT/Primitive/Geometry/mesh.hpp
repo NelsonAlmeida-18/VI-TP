@@ -15,7 +15,6 @@
 // partially inspired in pbrt book (3rd ed.), sec 3.6, pag 152
 
 typedef struct Face {
-    Vector edge1, edge2;        // edges
     int FaceID;                 // face ID
     int vert_ndx[3];            // indices to our internal vector of vertices (in Mesh)
     Vector geoNormal;           // geometric normal

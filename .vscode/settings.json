@@ -61,5 +61,6 @@
         "unordered_map": "cpp",
         "variant": "cpp",
         "algorithm": "cpp"
-    }
+    },
+    "cmake.configureOnOpen": true
 }
