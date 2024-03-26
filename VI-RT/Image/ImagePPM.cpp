@@ -8,6 +8,7 @@
 #include "ImagePPM.hpp"
 #include <iostream>
 #include <fstream>
+#include <algorithm>  
 
 void ImagePPM::ToneMap () {
     imageToSave = new PPM_pixel[W*H];
@@ -41,10 +42,27 @@ bool ImagePPM::Save (std::string filename) {
     try{
         ofs.open(filename, std::ios::out | std::ios::binary);
         if (ofs.fail()) throw "Can't open file";
-        
         ofs << "P6\n" << W << " " << H << "\n255\n";
-        // TODO: Verify this implementation is not according to the one cited above
-        ofs.write((char*)imageToSave, W*H*sizeof(PPM_pixel));
+        // Fill the image with sinthetic data
+        // float test[W][H][3];
+        // for (int j = 0 ; j< H ; j++) {
+        //     for (int i = 0; i < W ; ++i) {
+        //         test[i][j][0] = (float)i/W;
+        //         test[i][j][1] = (float)j/H;
+        //         test[i][j][2] = 0.2;
+        //     }
+        // }
+        // // Write the image to the file
+        for (int j = 0 ; j< H ; j++) {
+            for (int i = 0; i < W ; ++i) {
+                ofs << imageToSave[j*W+i].val[0];
+                ofs << imageToSave[j*W+i].val[1];
+                ofs << imageToSave[j*W+i].val[2];
+            }
+        }
+        
+
+        // ofs.write(reinterpret_cast<char*>(test), W*H*sizeof(PPM_pixel));
         ofs.close();
     }
     catch (std::ofstream::failure e) {

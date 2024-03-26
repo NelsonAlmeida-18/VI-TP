@@ -22,6 +22,12 @@ bool Perspective::GenerateRay(const int x, const int y, Ray *r, const float *cam
     float yc = ys*tan(fovH/2);
 
     Vector dir = Vector(xc, yc, 1);
+    // Lets multiply the dir with the c2w matrix
+    for(int i=0; i<3; i++){
+        
+    }
+
+
     dir.normalize();
     Vector invDir = Vector(1/dir.X, 1/dir.Y, 1/dir.Z);
     invDir.normalize();

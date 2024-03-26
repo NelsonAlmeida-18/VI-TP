@@ -43,7 +43,6 @@ int main(int argc, const char * argv[]) {
         return 1;
     }
     std::cout << "Scene Load: SUCCESS!! :-)\n";
-    scene.printSummary();
     std::cout << std::endl;
     
     // add an ambient light to the scene
@@ -51,16 +50,18 @@ int main(int argc, const char * argv[]) {
     scene.lights.push_back(&ambient);
     scene.numLights++;
     
+    scene.printSummary();
+
     // Image resolution
-    const int W= 640;
-    const int H= 480;
+    const int W= 512;
+    const int H= 512;
     
     img = new ImagePPM(W,H);
-    
+
     // Camera parameters
-    const Point Eye ={0,0,0}, At={0,0,1};
+    const Point Eye ={300,150,-800}, At={300,150,300};
     const Vector Up={0,1,0};
-    const float fovW = 60.f;
+    const float fovW = 90.f;
     const float fovH = fovW * (float)H/(float)W;  // in degrees
     const float fovWrad = fovW*3.14f/180.f, fovHrad = fovH*3.14f/180.f;    // to radians
     cam = new Perspective(Eye, At, Up, W, H, fovWrad, fovHrad);
