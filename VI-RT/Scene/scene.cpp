@@ -17,6 +17,7 @@
 #include <iostream>
 #include <set>
 #include <stdio.h>
+#include <unordered_map>
 
 using namespace tinyobj;
 
@@ -105,6 +106,7 @@ bool Scene::LoadObj(const std::string& fname) {
     // Each shape is one mesh
     // Lets iterate over shapes/meshes
     for (auto shape : shapes) {
+
         auto mat = &materials[shape.mesh.material_ids[0]];
         Phong *phong = new Phong();
         // Ambient component
@@ -138,75 +140,142 @@ bool Scene::LoadObj(const std::string& fname) {
         prim->material_ndx = shape.mesh.material_ids[0];
 
         // The primitives geomtry bounding box is calculated on the fly
-        const int V1st = shape.mesh.indices[0].vertex_index*3;
+        const int V1st = shape.mesh.indices[0].vertex_index;
         mesh->bb.min.set(attrib.vertices[V1st], attrib.vertices[V1st+1], attrib.vertices[V1st+2]);
         mesh->bb.max.set(attrib.vertices[V1st], attrib.vertices[V1st+1], attrib.vertices[V1st+2]);
 
+
+
         // Lets loop over all the faces and vertices
-        std::set<Point> vertices_rehash;
-        for (auto index : shape.mesh.indices) {
+        std::unordered_map<int, Point> vertices_rehash;
+        int indexOffset=0;
+        for (size_t faceNum = 0; faceNum<shape.mesh.num_face_vertices.size(); faceNum++){
+            size_t numVerticesPerFace = size_t(shape.mesh.num_face_vertices[faceNum]);
             
             Face *f = new Face();
             Point myVtcs[3];
 
-            // We will process 3 vertices at a time
-            for (int i=0; i<3; i++) {
-                const int Vndx = index.vertex_index*3;
-                myVtcs[i].set(attrib.vertices[Vndx], attrib.vertices[Vndx+1], attrib.vertices[Vndx+2]);
-                f->vert_ndx[i] = mesh->vertices.size();
+            // Lets get the vertices in the face
+            for (size_t vertexNum=0; vertexNum<numVerticesPerFace; vertexNum++) {
+                auto index = shape.mesh.indices[indexOffset+vertexNum];
                 
-                if (i==0){
-                    f->bb.min.set(myVtcs[0].X, myVtcs[0].Y, myVtcs[0].Z);
-                    f->bb.max.set(myVtcs[0].X, myVtcs[0].Y, myVtcs[0].Z);
-                }else{
-                    f->bb.update(myVtcs[i]);
-                }
+                auto vx = attrib.vertices[3*index.vertex_index+0];
+                auto vy = attrib.vertices[3*index.vertex_index+1];
+                auto vz = attrib.vertices[3*index.vertex_index+2];
+
+                Point newPoint(vx, vy, vz);
+                myVtcs[vertexNum] = newPoint;
+                f->vert_ndx[vertexNum] = mesh->vertices.size();
+                f->bb.update(newPoint);
+
                 // Lets add the face to vertex
                 // If the vertex is new then add it to the mesh
-                // auto known_vert = vertices_rehash.find(myVtcs[i]);
-                auto known_vert = vertices_rehash.find(myVtcs[i]);
+                auto known_vert = vertices_rehash.find(index.vertex_index);
 
-                if(known_vert == vertices_rehash.end()){
-                    // New vertice add it to the mesh
-                    vertices_rehash.insert(myVtcs[i]);
-                    mesh->vertices.push_back(myVtcs[i]);
+                if (known_vert == vertices_rehash.end()) {
+                    // New vertex, add it to the mesh
+                    vertices_rehash.insert(std::make_pair(index.vertex_index, newPoint));
+                    mesh->vertices.push_back(newPoint);
                     mesh->numVertices++;
-                }else{
+                } else {
                     // Vertex already exists
-                    f->vert_ndx[i] = std::distance(vertices_rehash.begin(), known_vert);
+                    f->vert_ndx[vertexNum] = std::distance(vertices_rehash.begin(), known_vert);
                 }
             }
+
             // add face to mesh and compute the geometric normal
             Vector v1 = myVtcs[0].vec2point(myVtcs[1]);
             Vector v2 = myVtcs[0].vec2point(myVtcs[2]);
-            
-            // TODO: Rever isto
-            // edge1 e edge2 estão na classe triangle.hpp, provavelmente temos de criar um triângulo com os 3 pontos que vamos buscar
-            // f->edge1 = v1;
-            // f->edge2 = v2;
 
             Vector normal = v1.cross(v2);
             normal.normalize();
             f->geoNormal.set(normal);
             f->FaceID = FaceID++;
+
             mesh->faces.push_back(*f);
             mesh->numFaces++;
-            
-            // // Lets calculate the primitives geometry bounding box
-            // const int Vndx = index.vertex_index*3;
-            // mesh->bb.min.set(std::min(mesh->bb.min.X, attrib.vertices[Vndx]), std::min(mesh->bb.min.Y, attrib.vertices[Vndx+1]), std::min(mesh->bb.min.Z, attrib.vertices[Vndx+2]));
-            // mesh->bb.max.set(std::max(mesh->bb.max.X, attrib.vertices[Vndx]), std::max(mesh->bb.max.Y, attrib.vertices[Vndx+1]), std::max(mesh->bb.max.Z, attrib.vertices[Vndx+2]));
 
-            // // Lets add the vertices to the mesh
-            // Point p(attrib.vertices[Vndx], attrib.vertices[Vndx+1], attrib.vertices[Vndx+2]);
-            // if (vertices_rehash.find(p) == vertices_rehash.end()) {
-            //     mesh->vertices.push_back(p);
-            //     vertices_rehash.insert(p);
-            // }
+    
+            // Add primitives to the scene
+            prims.push_back(prim);
+            numPrimitives++;
+
+            std::cout << "Face " << faceNum << " has " << numVerticesPerFace << " vertices" << std::endl;
+            indexOffset += numVerticesPerFace;
+
         }
-        // Add primitives to the scene
-        prims.push_back(prim);
-        numPrimitives++;
+
+        // for (auto index : shape.mesh.indices) {
+            
+        //     Face *f = new Face();
+        //     Point myVtcs[3];
+
+        //     // We will process 3 vertices at a time
+        //     for (int i=0; i<3; i++) {
+        //         const int Vndx = index.vertex_index;
+        //         myVtcs[i].set(attrib.vertices[Vndx*3], attrib.vertices[Vndx*3+1], attrib.vertices[Vndx*3+2]);
+        //         f->vert_ndx[i] = mesh->vertices.size();
+                
+        //         if (i==0){
+        //             f->bb.min.set(myVtcs[0].X, myVtcs[0].Y, myVtcs[0].Z);
+        //             f->bb.max.set(myVtcs[0].X, myVtcs[0].Y, myVtcs[0].Z);
+        //         }else{
+        //             f->bb.update(myVtcs[i]);
+        //         }
+        //         // Lets add the face to vertex
+        //         // If the vertex is new then add it to the mesh
+        //         // auto known_vert = vertices_rehash.find(myVtcs[i]);
+
+                
+        //         auto known_vert = vertices_rehash.find(Vndx);
+
+        //         if (known_vert == vertices_rehash.end()) {
+        //             // TODO: Rever isto
+        //             auto newVert = std::make_pair(Vndx, myVtcs[i]);
+        //             // New vertex, add it to the mesh
+        //             vertices_rehash.insert(newVert);
+
+        //             mesh->vertices.push_back(myVtcs[i]);
+        //             mesh->numVertices++;
+        //             f->vert_ndx[i] = mesh->numVertices;
+        //             mesh->bb.update(myVtcs[i]);
+        //         } else {
+        //             // Vertex already exists
+        //             f->vert_ndx[i] = std::distance(vertices_rehash.begin(), known_vert);
+        //         }
+        //     }
+        //     // add face to mesh and compute the geometric normal
+        //     Vector v1 = myVtcs[0].vec2point(myVtcs[1]);
+        //     Vector v2 = myVtcs[0].vec2point(myVtcs[2]);
+            
+        //     // TODO: Rever isto
+        //     // edge1 e edge2 estão na classe triangle.hpp, provavelmente temos de criar um triângulo com os 3 pontos que vamos buscar
+        //     // f->edge1 = v1;
+        //     // f->edge2 = v2;
+
+        //     Vector normal = v1.cross(v2);
+        //     normal.normalize();
+        //     f->geoNormal.set(normal);
+        //     f->FaceID = FaceID++;
+
+        //     mesh->faces.push_back(*f);
+        //     mesh->numFaces++;
+
+        //     std::cout << "Index " << index.vertex_index << std::endl;
+ 
+        // }
+        // // Add primitives to the scene
+        // prims.push_back(prim);
+        // numPrimitives++;
+
+
+        // // FOr each mesh we will debug the number of vertices and faces
+        // std::cout << "Mesh " << shape.name << " has " << mesh->numVertices << " vertices and " << mesh->faces.size() << " faces" << std::endl;
+        // // For each mesh we will print the position of its vertices
+        // for (int i=0 ; i<mesh->numVertices ; i++) {
+        
+        //     std::cout << "Vertex " << i << " : " << mesh->vertices[i].X << " " << mesh->vertices[i].Y << " " << mesh->vertices[i].Z << std::endl;
+        // }
 
     }
 
@@ -219,7 +288,7 @@ bool Scene::trace (Ray r, Intersection *isect) {
     bool intersection = false;    
     
     if (numPrimitives==0) return false;
-    
+    //std::cout << "Tracing primitives: " << numPrimitives << std::endl;
     // iterate over all primitives
     for (auto prim_itr = prims.begin() ; prim_itr != prims.end() ; prim_itr++) {
         if ((*prim_itr)->g->intersect(r, &curr_isect)) {
@@ -259,4 +328,3 @@ bool Scene::visibility (Ray s, const float maxL) {
     }
     return visible;
 }
-

@@ -36,10 +36,6 @@ public:
         std::cout << "#materials = " << numBRDFs << " ;" << std::endl;
     }
 
-    void addBRDF (BRDF *f) {
-        BRDFs.push_back(f);
-        numBRDFs++;
-    }
 };
 
 #endif /* Scene_hpp */

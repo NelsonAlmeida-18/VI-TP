@@ -10,7 +10,7 @@
 
 #include "vector.hpp"
 #include "ray.hpp"
-
+#include <limits>
 
 typedef struct BB {
 public:
@@ -38,6 +38,7 @@ public:
 
         // AABB are defined by two terms, a minimum and a max bounding box
         float tmin = 0.0;
+
         float tmax = std::numeric_limits<float>::max();
 
 

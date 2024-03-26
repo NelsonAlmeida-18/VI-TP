@@ -8,7 +8,10 @@
 #include "mesh.hpp"
 #include <vector>
 #include <limits>
+#include <iostream>
+#include <stdio.h>
 
+using namespace std;
 // see pbrt book (3rd ed.), sec 3.6.2, pag 157
 //
 // Suggestion: use:
@@ -30,6 +33,7 @@ bool Mesh::TriangleIntersect (Ray r, Face f, Intersection *isect) {
     //TODO: Rever isto
     Point v0v1Aux = vertices[f.vert_ndx[1]] - vertices[f.vert_ndx[0]];
     Vector v0v1(v0v1Aux.X, v0v1Aux.Y, v0v1Aux.Z);
+    cout << "v0v1: " << v0v1.X << " " << v0v1.Y << " " << v0v1.Z << endl;
     Point v0v2Aux = vertices[f.vert_ndx[2]] - vertices[f.vert_ndx[0]];
     Vector v0v2(v0v2Aux.X, v0v2Aux.Y, v0v2Aux.Z);
     Vector pvec = r.dir.cross(v0v2);
@@ -50,17 +54,20 @@ bool Mesh::TriangleIntersect (Ray r, Face f, Intersection *isect) {
 }
 
 bool Mesh::intersect (Ray r, Intersection *isect) {
-    bool intersect = true, intersect_this_face;
+    bool intersect = false;
+    
+    //bool intersect = true, intersect_this_face;
     Intersection min_isect, curr_isect;
     float min_depth=MAXFLOAT;
     // intersect the ray with the mesh BB
+    // cout << "Intersecting mesh with BB: " << bb.intersect(r) << endl;
     if (!bb.intersect(r)) return false;
     
     // If it intersects then loop through the faces
     intersect = false;
     for (auto face_it=faces.begin() ; face_it != faces.end() ; face_it++) {
-        intersect_this_face = TriangleIntersect(r, *face_it, &curr_isect);
-        if (!intersect_this_face) continue;
+        //intersect_this_face = TriangleIntersect(r, *face_it, &curr_isect);
+        if (! TriangleIntersect(r, *face_it, &curr_isect)) continue;
         
         intersect = true;
         if (curr_isect.depth < min_depth) {  // this is closer
