@@ -32,6 +32,8 @@ bool ImagePPM::Save (std::string filename) {
         return false;
     }
 
+    std::cout << "Saving image to " << filename << std::endl;
+
     // convert from float to {0,1,..., 255}
     ToneMap();
 

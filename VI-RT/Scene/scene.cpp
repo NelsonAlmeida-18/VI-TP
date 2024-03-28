@@ -165,8 +165,14 @@ bool Scene::LoadObj(const std::string& fname) {
 
                 Point newPoint(vx, vy, vz);
                 myVtcs[vertexNum] = newPoint;
+
+                if (vertexNum==0){
+                    f->bb.min.set(myVtcs[0].X, myVtcs[0].Y, myVtcs[0].Z);
+                    f->bb.max.set(myVtcs[0].X, myVtcs[0].Y, myVtcs[0].Z);
+                }
+                else f->bb.update(newPoint);
+
                 f->vert_ndx[vertexNum] = mesh->vertices.size();
-                f->bb.update(newPoint);
 
                 // Lets add the face to vertex
                 // If the vertex is new then add it to the mesh
@@ -194,89 +200,28 @@ bool Scene::LoadObj(const std::string& fname) {
 
             mesh->faces.push_back(*f);
             mesh->numFaces++;
-
-    
-            // Add primitives to the scene
-            prims.push_back(prim);
-            numPrimitives++;
-
-            std::cout << "Face " << faceNum << " has " << numVerticesPerFace << " vertices" << std::endl;
+            // std::cout << "Face " << faceNum << " has " << numVerticesPerFace << " vertices" << std::endl;
             indexOffset += numVerticesPerFace;
 
         }
-
-        // for (auto index : shape.mesh.indices) {
             
-        //     Face *f = new Face();
-        //     Point myVtcs[3];
+        // Add primitives to the scene
+        prims.push_back(prim);
+        numPrimitives++;
 
-        //     // We will process 3 vertices at a time
+        std::cout << "Mesh " << shape.name << " has " << mesh->numVertices << " vertices and " << mesh->faces.size() << " faces" << std::endl;
+        // for (auto f : mesh->faces) {
+        //     // Lets print the vertices coordinates for each face
+        //     std::cout << "Face " << f.FaceID << " has vertices: ";
         //     for (int i=0; i<3; i++) {
-        //         const int Vndx = index.vertex_index;
-        //         myVtcs[i].set(attrib.vertices[Vndx*3], attrib.vertices[Vndx*3+1], attrib.vertices[Vndx*3+2]);
-        //         f->vert_ndx[i] = mesh->vertices.size();
-                
-        //         if (i==0){
-        //             f->bb.min.set(myVtcs[0].X, myVtcs[0].Y, myVtcs[0].Z);
-        //             f->bb.max.set(myVtcs[0].X, myVtcs[0].Y, myVtcs[0].Z);
-        //         }else{
-        //             f->bb.update(myVtcs[i]);
-        //         }
-        //         // Lets add the face to vertex
-        //         // If the vertex is new then add it to the mesh
-        //         // auto known_vert = vertices_rehash.find(myVtcs[i]);
-
-                
-        //         auto known_vert = vertices_rehash.find(Vndx);
-
-        //         if (known_vert == vertices_rehash.end()) {
-        //             // TODO: Rever isto
-        //             auto newVert = std::make_pair(Vndx, myVtcs[i]);
-        //             // New vertex, add it to the mesh
-        //             vertices_rehash.insert(newVert);
-
-        //             mesh->vertices.push_back(myVtcs[i]);
-        //             mesh->numVertices++;
-        //             f->vert_ndx[i] = mesh->numVertices;
-        //             mesh->bb.update(myVtcs[i]);
-        //         } else {
-        //             // Vertex already exists
-        //             f->vert_ndx[i] = std::distance(vertices_rehash.begin(), known_vert);
-        //         }
+        //         std::cout << mesh->vertices[f.vert_ndx[i]].X << " " << mesh->vertices[f.vert_ndx[i]].Y << " " << mesh->vertices[f.vert_ndx[i]].Z << " ";
         //     }
-        //     // add face to mesh and compute the geometric normal
-        //     Vector v1 = myVtcs[0].vec2point(myVtcs[1]);
-        //     Vector v2 = myVtcs[0].vec2point(myVtcs[2]);
-            
-        //     // TODO: Rever isto
-        //     // edge1 e edge2 estão na classe triangle.hpp, provavelmente temos de criar um triângulo com os 3 pontos que vamos buscar
-        //     // f->edge1 = v1;
-        //     // f->edge2 = v2;
-
-        //     Vector normal = v1.cross(v2);
-        //     normal.normalize();
-        //     f->geoNormal.set(normal);
-        //     f->FaceID = FaceID++;
-
-        //     mesh->faces.push_back(*f);
-        //     mesh->numFaces++;
-
-        //     std::cout << "Index " << index.vertex_index << std::endl;
- 
-        // }
-        // // Add primitives to the scene
-        // prims.push_back(prim);
-        // numPrimitives++;
-
-
-        // // FOr each mesh we will debug the number of vertices and faces
-        // std::cout << "Mesh " << shape.name << " has " << mesh->numVertices << " vertices and " << mesh->faces.size() << " faces" << std::endl;
-        // // For each mesh we will print the position of its vertices
-        // for (int i=0 ; i<mesh->numVertices ; i++) {
-        
-        //     std::cout << "Vertex " << i << " : " << mesh->vertices[i].X << " " << mesh->vertices[i].Y << " " << mesh->vertices[i].Z << std::endl;
         // }
 
+        // Lets print every face bounding box
+        for (auto f : mesh->faces) {
+            std::cout << "Face " << f.FaceID << " has bounding box min: " << f.bb.min.X << " " << f.bb.min.Y << " " << f.bb.min.Z << " and max: " << f.bb.max.X << " " << f.bb.max.Y << " " << f.bb.max.Z << std::endl;
+        }
     }
 
 
@@ -288,11 +233,15 @@ bool Scene::trace (Ray r, Intersection *isect) {
     bool intersection = false;    
     
     if (numPrimitives==0) return false;
-    //std::cout << "Tracing primitives: " << numPrimitives << std::endl;
+
     // iterate over all primitives
     for (auto prim_itr = prims.begin() ; prim_itr != prims.end() ; prim_itr++) {
+
         if ((*prim_itr)->g->intersect(r, &curr_isect)) {
+
+            
             if (!intersection) { // first intersection
+                std::cout << "First intersection: " << std::endl;
                 intersection = true;
                 *isect = curr_isect;
                 isect->f = BRDFs[(*prim_itr)->material_ndx];
@@ -305,8 +254,7 @@ bool Scene::trace (Ray r, Intersection *isect) {
         }
     }
 
-    if (intersection) std::cout << "Intersected" << std::endl;
-
+    // std::cout << "Intersection result" << intersection << std::endl;
 
     return intersection;
 }

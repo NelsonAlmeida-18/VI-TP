@@ -15,6 +15,9 @@ RGB AmbientShader::shade(bool intersected, Intersection isect, int depth) {
     if (!intersected) {
         return (background);
     }
+
+    std::cout << "Ambient shading at pixel (" << isect.p.X << "," << isect.p.Y << ")\n";
+
     if (isect.isLight) { // intersection with a light source
         return isect.Le;
     }

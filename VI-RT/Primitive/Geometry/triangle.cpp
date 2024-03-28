@@ -7,12 +7,15 @@
 
 #include "triangle.hpp"
 #include "BB.hpp"
+#include <stdio.h>
+#include <iostream>
 
 
 // https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
 // Moller Trumbore intersection algorithm
 bool Triangle::intersect(Ray r, Intersection *isect) {
 
+    std::cout<< "Here in triangle intersect\n" << std::endl;
     
     if (!bb.intersect(r)) {
         return false;
@@ -53,6 +56,7 @@ bool Triangle::intersect(Ray r, Intersection *isect) {
     if (t > EPSILON) // ray intersection
     {
         Point pHit = r.o + t* r.dir;
+        std::cout << "PHIT X: " << pHit.X << "PHIT Y: " << pHit.Y << "PHIT Z: " << pHit.Z <<std::endl;
         
         // Fill Intersection data from triangle hit : pag 165
         Vector wo = -1.f * r.dir;
@@ -71,6 +75,8 @@ bool Triangle::intersect(Ray r, Intersection *isect) {
     else  {// This means that there is a line intersection but not a ray intersection.
         return false;
     }
+
+
 }
 
 bool Triangle::isInside(Point p) {

@@ -11,6 +11,8 @@
 #include "vector.hpp"
 #include "ray.hpp"
 #include <limits>
+#include <stdio.h>
+#include <iostream>
 
 typedef struct BB {
 public:
@@ -36,17 +38,17 @@ public:
         
         // Found on: https://tavianator.com/2022/ray_box_boundary.html
 
+        // Lets print the bounding box limits
+        // std::cout << "Bounding Box limits" << std::endl;
+        // std::cout << "min: " << min.X << " " << min.Y << " " << min.Z << std::endl;
+
         // AABB are defined by two terms, a minimum and a max bounding box
-        float tmin = 0.0;
-
-        float tmax = std::numeric_limits<float>::max();
-
 
         float t1x = (min.X - r.o.X) * r.invDir.X;
         float t2x = (max.X - r.o.X) * r.invDir.X;
 
-        tmin = std::fmin(std::fmax(t1x, tmin), std::fmax(t2x, tmin));
-        tmax = std::fmax(std::fmin(t1x, tmax), std::fmin(t2x, tmax));
+        float tmin = std::fmin(t1x, t2x);
+        float tmax = std::fmax(t1x, t2x);
 
         float t1y = (min.Y - r.o.Y) * r.invDir.Y;
         float t2y = (max.Y - r.o.Y) * r.invDir.Y;
@@ -61,8 +63,23 @@ public:
         tmax = std::fmax(std::fmin(t1z, tmax), std::fmin(t2z, tmax));
         
         // This mitigates the edge case where the ray is parallel to the plane or touches the edge of the plane
-        return tmin<=tmax; 
+        
+        return tmax>=tmin; 
+       
     }
+
+    bool testAABBIntersect(){
+        Ray r;
+        r.o = Point(0,0,0);
+        r.dir = Vector(1,1,1);
+        // r.invDir = Vector(-1,1,-1);
+        BB bb_toTest;
+        bb_toTest.min = Point(-1,-1,-1);
+        bb_toTest.max = Point(1,1,1);
+        return bb_toTest.intersect(r);
+
+    }
+    
 } BB;
 
 #endif /* AABB_hpp */

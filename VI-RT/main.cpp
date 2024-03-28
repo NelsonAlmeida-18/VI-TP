@@ -35,7 +35,7 @@ int main(int argc, const char * argv[]) {
         success = scene.Load(argv[1]);
     } else {
         // load the default scene
-        success = scene.Load("./VI-RT/utils/cornell-box.obj");
+        success = scene.Load("/Users/rkeat/Desktop/Universidade/1anoMestrado/2semestre/VI-TP/VI-RT/utils/cornell-box.obj");
     }
     
     if (!success) {
@@ -59,27 +59,34 @@ int main(int argc, const char * argv[]) {
     img = new ImagePPM(W,H);
 
     // Camera parameters
-    const Point Eye ={300,150,-800}, At={300,150,300};
+    const Point Eye ={280,375,-830}, At={280,265,280};
     const Vector Up={0,1,0};
-    const float fovW = 90.f;
-    const float fovH = fovW * (float)H/(float)W;  // in degrees
-    const float fovWrad = fovW*3.14f/180.f, fovHrad = fovH*3.14f/180.f;    // to radians
-    cam = new Perspective(Eye, At, Up, W, H, fovWrad, fovHrad);
-    
+    const float fovW = 45.0, fovH = 45.0;
+    cam = new Perspective(Eye, At, Up, fovW, fovH, W, H);
+
+    BB bb; // Create an instance of the BB c d dlass
+    bool resultOfAABB = bb.testAABBIntersect(); // Call the testAABBIntersect() function on the instance
+    std::cout << "Result of AABB test: " << resultOfAABB << std::endl; // Print the result of the test
+
     // create the shader
     RGB background(0.05, 0.05, 0.55);
     shd = new AmbientShader(&scene, background);
+    std::cout << "Shader created\n";
     // declare the renderer
     int spp=1;     // samples per pixel
+
     StandardRenderer myRender (cam, &scene, img, shd, spp);
     // render
     start = clock();
+    std::cout << "Rendering\n";
     myRender.Render();
+    std::cout << "Rendered\n";
     end = clock();
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
 
     // save the image
     img->Save("./MyImage.ppm");
+
     
     fprintf (stdout, "Rendering time = %.3lf secs\n\n", cpu_time_used);
     
