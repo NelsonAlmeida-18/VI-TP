@@ -41,10 +41,8 @@ void StandardRenderer::Render () {
             // shade this intersection (shader) - remember: depth=0
             //std::cout << "Shading at pixel (" << x << "," << y << ")\n";
             color = shd->shade(intersected, isect, depth);
-            //color = RGB(1.,0.,0.); // for debugging purposes (red color)
             
             // write the result into the image frame buffer (image)
-            //std::cout << "Color at pixel (" << x << "," << y << ") = R:" << color.R  <<" G: " << color.G << " B: " << color.B << "\n";
             img->set(x,y,color);
             
         } // loop over columns

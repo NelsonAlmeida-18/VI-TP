@@ -10,7 +10,6 @@
 
 RGB AmbientShader::shade(bool intersected, Intersection isect, int depth) {
     RGB color(0.,0.,0.);
-    RGB zeroKaDebug(1.0,0.,0.);
 
     
     // if no intersection, return background
@@ -27,12 +26,11 @@ RGB AmbientShader::shade(bool intersected, Intersection isect, int depth) {
     Phong *f = (Phong *)isect.f;
     RGB Ka = f->Ka;
     //std::cout << "Ambient Light Ka " << Ka.R << " " << Ka.G << " " << Ka.B << "\n";
-    std::cout << "Face " << isect.FaceID << std::endl;
     if (f->Ka.isZero()) return color;
     
-    if (isect.FaceID == 0) {
-        std::cout << "Face " << isect.FaceID << " has ambient color " << f->Ka.R << " " << f->Ka.G << " " << f->Ka.B << "\n";
-    }
+
+    // if (f->Ka.B > 0) std::cout << "Face " << isect.FaceID << " has ambient color " << f->Ka.R << " " << f->Ka.G << " " << f->Ka.B << "\n";
+    
     
     // ambient shade
     // Loop over scene's light sources and process Ambient Lights

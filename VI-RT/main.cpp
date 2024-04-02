@@ -35,7 +35,7 @@ int main(int argc, const char * argv[]) {
         success = scene.Load(argv[1]);
     } else {
         // load the default scene
-        success = scene.Load("/home/gustavo/cg/VI-TP/VI-RT/utils/cornell-box.obj");
+        success = scene.Load("/Users/rkeat/Desktop/Universidade/1anoMestrado/2semestre/VI-TP/VI-RT/utils/cornell-box.obj");
     }
     
     if (!success) {
@@ -46,20 +46,20 @@ int main(int argc, const char * argv[]) {
     std::cout << std::endl;
     
     // add an ambient light to the scene
-    AmbientLight ambient(RGB(0.9,0.9,0.9));
+    AmbientLight ambient(RGB(0.5,0.5,0.5));
     scene.lights.push_back(&ambient);
     scene.numLights++;
     
     scene.printSummary();
 
     // Image resolution
-    const int W= 512;
-    const int H= 512;
+    const int W= 640;
+    const int H= 640;
     
     img = new ImagePPM(W,H);
 
     // Camera parameters
-    const Point Eye ={300.0, 150.0, -800.0}, At={300.0, 150.0, 300.0};
+    const Point Eye ={280.0, 375.0, -830.0}, At={280.0, 265.0, 280.0};
     const Vector Up={0,1,0};
     const float fovW = 45.0, fovH = 45.0;
     cam = new Perspective(Eye, At, Up, W, H, fovW, fovH);

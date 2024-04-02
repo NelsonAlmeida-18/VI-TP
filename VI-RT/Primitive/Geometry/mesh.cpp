@@ -138,7 +138,6 @@ bool Mesh::intersect (Ray r, Intersection *isect) {
 
                 intersect = true;
                 if (isect->depth < min_depth) {  // this is closer
-                    std::cout << "Mesh intersect: Some triangle intersects " << face_it->FaceID << " intersects the ray" << std::endl;
                     min_depth = isect->depth;
                     min_isect = *isect;
                 }

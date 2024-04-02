@@ -210,25 +210,32 @@ bool Scene::LoadObj(const std::string& fname) {
         prims.push_back(prim);
         numPrimitives++;
 
-        std::cout << "Mesh " << shape.name << " has " << mesh->numVertices << " vertices and " << mesh->faces.size() << " faces" << std::endl;
-        for (auto f : mesh->faces) {
-            // Lets print the vertices coordinates for each face
-            if(f.FaceID==6){ 
-                std::cout << "Face " << f.FaceID << " has vertices: ";
+        std::cout << "Mesh " << shape.name <<  FaceID << " has " << mesh->numVertices << " vertices and " << mesh->faces.size() << " faces" << std::endl;
+        std::cout << "Mesh material id" << BRDFs.size() << std::endl;
+        std::cout << "Material color" << mat->ambient[0] << " " << mat->ambient[1] << " " << mat->ambient[2] << std::endl;
+        // for (auto f : mesh->faces) {
+        //     // Lets print the vertices coordinates for each face
+        //     if(f.FaceID==6){ 
+        //         // std::cout << "Face " << f.FaceID << " has vertices: ";
                 
-                for (int i=0; i<3; i++) {
+        //         for (int i=0; i<3; i++) {
                 
-                    std::cout << "Vertice index" << i << " "<< mesh->vertices[f.vert_ndx[i]].X << " " << mesh->vertices[f.vert_ndx[i]].Y << " " << mesh->vertices[f.vert_ndx[i]].Z << " ";
-                }
-                std::cout << "Face has color " << mat->ambient[0] << " " << mat->ambient[1] << " " << mat->ambient[2] << std::endl;
-            }
-        }
+        //             std::cout << "Vertice index" << i << " "<< mesh->vertices[f.vert_ndx[i]].X << " " << mesh->vertices[f.vert_ndx[i]].Y << " " << mesh->vertices[f.vert_ndx[i]].Z << " ";
+        //         }
+        //         std::cout << "Face has color " << mat->ambient[0] << " " << mat->ambient[1] << " " << mat->ambient[2] << std::endl;
+        //     }
+        // }
 
         // Lets print every face bounding box
         // for (auto f : mesh->faces) {
         //     std::cout << "Face " << f.FaceID << " has bounding box min: " << f.bb.min.X << " " << f.bb.min.Y << " " << f.bb.min.Z << " and max: " << f.bb.max.X << " " << f.bb.max.Y << " " << f.bb.max.Z << std::endl;
         // }
     }
+
+    // Lets print the materials indexes of the scene
+    // for (int i=0; i<BRDFs.size(); i++) {
+    //     std::cout << "Material index " << i << " has ambient color "  << std::endl;
+    // }
 
 
     return true;
@@ -240,28 +247,21 @@ bool Scene::trace (Ray r, Intersection *isect) {
     
     if (numPrimitives==0) return false;
 
+    // initialize isect->depth to a large value
+    isect->depth = std::numeric_limits<float>::max();
+
     // iterate over all primitives
     for (auto prim_itr = prims.begin() ; prim_itr != prims.end() ; prim_itr++) {
 
         if ((*prim_itr)->g->intersect(r, &curr_isect)) {
 
-            
-            if (!intersection) { // first intersection
-                //std::cout << "First intersection: " << std::endl;
+            if (curr_isect.depth < isect->depth) { // closest intersection
                 intersection = true;
                 *isect = curr_isect;
                 isect->f = BRDFs[(*prim_itr)->material_ndx];
-                
-            }
-            else if (curr_isect.depth < isect->depth) {
-                *isect = curr_isect;
-                isect->f = BRDFs[(*prim_itr)->material_ndx];
-                std::cout << "Material index " << (*prim_itr)->material_ndx << std::endl;
             }
         }
     }
-
-    // std::cout << "Intersection result" << intersection << std::endl;
 
     return intersection;
 }

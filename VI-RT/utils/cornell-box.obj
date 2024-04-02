@@ -8,7 +8,7 @@
 mtllib cornell-box.mtl
 
 o floor
-usemtl blue
+usemtl white
 v 552.8 0.0   0.0
 v 0.0   0.0   0.0
 v 0.0   0.0 559.2
@@ -44,7 +44,13 @@ v    0.0 548.8   0.0
 v    0.0 548.8 559.2
 f -4 -3 -2 -1
 
-
+o back_wall
+usemtl white
+v 549.6   0.0 559.2
+v 0.0   0.0 559.2
+v 0.0 548.8 559.2
+v 556.0 548.8 559.2
+f -4 -3 -2 -1
 
 
 o ceiling

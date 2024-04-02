@@ -18,7 +18,9 @@ Ka 0 0 1
 Kd 0 0 1
 Ks 0 0 0
 
+
 newmtl light
 Ka 20 20 20
 Kd 1 1 1
 Ks 0 0 0
+
