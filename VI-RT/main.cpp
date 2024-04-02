@@ -35,7 +35,7 @@ int main(int argc, const char * argv[]) {
         success = scene.Load(argv[1]);
     } else {
         // load the default scene
-        success = scene.Load("/Users/rkeat/Desktop/Universidade/1anoMestrado/2semestre/VI-TP/VI-RT/utils/cornell-box.obj");
+        success = scene.Load("/home/gustavo/cg/VI-TP/VI-RT/utils/cornell-box.obj");
     }
     
     if (!success) {
@@ -59,10 +59,10 @@ int main(int argc, const char * argv[]) {
     img = new ImagePPM(W,H);
 
     // Camera parameters
-    const Point Eye ={280,375,-830}, At={280,265,280};
+    const Point Eye ={300.0, 150.0, -800.0}, At={300.0, 150.0, 300.0};
     const Vector Up={0,1,0};
     const float fovW = 45.0, fovH = 45.0;
-    cam = new Perspective(Eye, At, Up, fovW, fovH, W, H);
+    cam = new Perspective(Eye, At, Up, W, H, fovW, fovH);
 
     BB bb; // Create an instance of the BB c d dlass
     bool resultOfAABB = bb.testAABBIntersect(); // Call the testAABBIntersect() function on the instance

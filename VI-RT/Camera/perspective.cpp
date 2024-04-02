@@ -18,11 +18,12 @@ bool Perspective::GenerateRay(const int x, const int y, Ray *r, const float *cam
     // Theta h = Fovy
     // Theta w = Fovx
     // Lets define the ray 
-    float xs = (2*(x+0.5)/2)-1;
-    float ys = 1-((2*(H-y-1)+0.5)/H);
+    float xs = (2*(x+0.5)/W)-1;
+    float ys =((2*(H-y-1)+0.5)/H)-1;
 
     float xc = xs*tan(fovW/2);
     float yc = ys*tan(fovH/2);
+    
 
     // Vector dir = Vector(xc, yc, 1);
     float coord[3] = {xc, yc, 1};
@@ -47,5 +48,5 @@ bool Perspective::GenerateRay(const int x, const int y, Ray *r, const float *cam
     r->pix_x = xc;
     r->pix_y = yc;
 
-    return false;
+    return true;
 }
