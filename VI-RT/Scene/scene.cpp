@@ -81,7 +81,6 @@ bool Scene::Load (const std::string &fname) {
 }
 
 
-
 bool Scene::LoadObj(const std::string& fname) {
 
     tinyobj::ObjReader reader;
@@ -176,17 +175,19 @@ bool Scene::LoadObj(const std::string& fname) {
 
                 // Lets add the face to vertex
                 // If the vertex is new then add it to the mesh
-                auto known_vert = vertices_rehash.find(index.vertex_index);
+                // auto known_vert = vertices_rehash.find(index.vertex_index);
 
-                if (known_vert == vertices_rehash.end()) {
-                    // New vertex, add it to the mesh
-                    vertices_rehash.insert(std::make_pair(index.vertex_index, newPoint));
-                    mesh->vertices.push_back(newPoint);
-                    mesh->numVertices++;
-                } else {
-                    // Vertex already exists
-                    f->vert_ndx[vertexNum] = std::distance(vertices_rehash.begin(), known_vert);
-                }
+                // if (known_vert == vertices_rehash.end()) {
+                //     // New vertex, add it to the mesh
+                //     vertices_rehash.insert(std::make_pair(index.vertex_index, newPoint));
+                //     mesh->vertices.push_back(newPoint);
+                //     mesh->numVertices++;
+                // } else {
+                //     // Vertex already exists
+                //     f->vert_ndx[vertexNum] = std::distance(vertices_rehash.begin(), known_vert);
+                // }
+                mesh->vertices.push_back(newPoint);
+                mesh->numVertices++;
             }
 
             // add face to mesh and compute the geometric normal
@@ -210,18 +211,23 @@ bool Scene::LoadObj(const std::string& fname) {
         numPrimitives++;
 
         std::cout << "Mesh " << shape.name << " has " << mesh->numVertices << " vertices and " << mesh->faces.size() << " faces" << std::endl;
-        // for (auto f : mesh->faces) {
-        //     // Lets print the vertices coordinates for each face
-        //     std::cout << "Face " << f.FaceID << " has vertices: ";
-        //     for (int i=0; i<3; i++) {
-        //         std::cout << mesh->vertices[f.vert_ndx[i]].X << " " << mesh->vertices[f.vert_ndx[i]].Y << " " << mesh->vertices[f.vert_ndx[i]].Z << " ";
-        //     }
-        // }
+        for (auto f : mesh->faces) {
+            // Lets print the vertices coordinates for each face
+            if(f.FaceID==6){ 
+                std::cout << "Face " << f.FaceID << " has vertices: ";
+                
+                for (int i=0; i<3; i++) {
+                
+                    std::cout << "Vertice index" << i << " "<< mesh->vertices[f.vert_ndx[i]].X << " " << mesh->vertices[f.vert_ndx[i]].Y << " " << mesh->vertices[f.vert_ndx[i]].Z << " ";
+                }
+                std::cout << "Face has color " << mat->ambient[0] << " " << mat->ambient[1] << " " << mat->ambient[2] << std::endl;
+            }
+        }
 
         // Lets print every face bounding box
-        for (auto f : mesh->faces) {
-            std::cout << "Face " << f.FaceID << " has bounding box min: " << f.bb.min.X << " " << f.bb.min.Y << " " << f.bb.min.Z << " and max: " << f.bb.max.X << " " << f.bb.max.Y << " " << f.bb.max.Z << std::endl;
-        }
+        // for (auto f : mesh->faces) {
+        //     std::cout << "Face " << f.FaceID << " has bounding box min: " << f.bb.min.X << " " << f.bb.min.Y << " " << f.bb.min.Z << " and max: " << f.bb.max.X << " " << f.bb.max.Y << " " << f.bb.max.Z << std::endl;
+        // }
     }
 
 
@@ -250,6 +256,7 @@ bool Scene::trace (Ray r, Intersection *isect) {
             else if (curr_isect.depth < isect->depth) {
                 *isect = curr_isect;
                 isect->f = BRDFs[(*prim_itr)->material_ndx];
+                std::cout << "Material index " << (*prim_itr)->material_ndx << std::endl;
             }
         }
     }

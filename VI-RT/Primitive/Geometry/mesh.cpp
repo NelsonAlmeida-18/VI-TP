@@ -91,7 +91,7 @@ bool Mesh::TriangleIntersect (Ray r, Face f, Intersection *isect) {
         //std::cout << "Face " << f.FaceID << " p: " << isect->p.X << " " << isect->p.Y << " " << isect->p.Z << std::endl;
         isect->gn = e1.cross(e2);
         isect->FaceID = f.FaceID;
-        // isect->f = f->brdf;
+        // isect->f = f.brdf;
         return true;
     }
     
@@ -144,8 +144,6 @@ bool Mesh::intersect (Ray r, Intersection *isect) {
             }
         }
     }
-
-    //*isect = min_isect;
 
     return intersect;
 }
