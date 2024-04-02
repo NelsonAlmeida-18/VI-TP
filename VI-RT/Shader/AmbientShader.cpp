@@ -26,7 +26,7 @@ RGB AmbientShader::shade(bool intersected, Intersection isect, int depth) {
     // verify whether the intersected object has an ambient component
     Phong *f = (Phong *)isect.f;
     RGB Ka = f->Ka;
-    std::cout << "Ambient Light Ka " << Ka.R << " " << Ka.G << " " << Ka.B << "\n";
+    //std::cout << "Ambient Light Ka " << Ka.R << " " << Ka.G << " " << Ka.B << "\n";
 
     if (f->Ka.isZero()) return color;
     

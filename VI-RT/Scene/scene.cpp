@@ -241,7 +241,7 @@ bool Scene::trace (Ray r, Intersection *isect) {
 
             
             if (!intersection) { // first intersection
-                std::cout << "First intersection: " << std::endl;
+                //std::cout << "First intersection: " << std::endl;
                 intersection = true;
                 *isect = curr_isect;
                 isect->f = BRDFs[(*prim_itr)->material_ndx];

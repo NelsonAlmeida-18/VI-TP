@@ -37,14 +37,14 @@ void StandardRenderer::Render () {
             intersected = scene->trace(primary, &isect);
 
             if (!intersected) continue; // no intersection, continue with next ray
-            std::cout << "Intersection at pixel (" << x << "," << y << ")\n";
+            //std::cout << "Intersection at pixel (" << x << "," << y << ")\n";
             // shade this intersection (shader) - remember: depth=0
-            std::cout << "Shading at pixel (" << x << "," << y << ")\n";
+            //std::cout << "Shading at pixel (" << x << "," << y << ")\n";
             color = shd->shade(intersected, isect, depth);
             //color = RGB(1.,0.,0.); // for debugging purposes (red color)
             
             // write the result into the image frame buffer (image)
-            std::cout << "Color at pixel (" << x << "," << y << ") = R:" << color.R  <<" G: " << color.G << " B: " << color.B << "\n";
+            //std::cout << "Color at pixel (" << x << "," << y << ") = R:" << color.R  <<" G: " << color.G << " B: " << color.B << "\n";
             img->set(x,y,color);
             
         } // loop over columns

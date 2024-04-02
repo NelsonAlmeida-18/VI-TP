@@ -88,10 +88,10 @@ bool Mesh::TriangleIntersect (Ray r, Face f, Intersection *isect) {
     if (t>epsilon) {
         isect->depth = t;
         isect->p = r.o + t*r.dir;
-        std::cout << "Face " << f.FaceID << " p: " << isect->p.X << " " << isect->p.Y << " " << isect->p.Z << std::endl;
+        //std::cout << "Face " << f.FaceID << " p: " << isect->p.X << " " << isect->p.Y << " " << isect->p.Z << std::endl;
         isect->gn = e1.cross(e2);
+        isect->FaceID = f.FaceID;
         // isect->f = f->brdf;
-        // std::cout << "Face " << f.FaceID << " det: " << det << std::endl;
         return true;
     }
     
@@ -142,8 +142,10 @@ bool Mesh::intersect (Ray r, Intersection *isect) {
                 min_depth = curr_isect.depth;
                 min_isect = curr_isect;
             }
-            
         }
     }
+
+    //*isect = min_isect;
+
     return intersect;
 }
