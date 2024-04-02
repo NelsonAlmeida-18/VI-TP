@@ -107,7 +107,7 @@ bool Mesh::TriangleIntersect (Ray r, Face f, Intersection *isect) {
     // if (v < 0 || u + v > 1) return false;
     // float t = v0v2.dot(qvec) * invDet;
     
-    return true;
+    return false;
 }
 
 bool Mesh::intersect (Ray r, Intersection *isect) {
@@ -133,15 +133,17 @@ bool Mesh::intersect (Ray r, Intersection *isect) {
             
 
             //intersect_this_face = TriangleIntersect(r, *face_it, &curr_isect);
-            if (! TriangleIntersect(r, *face_it, &curr_isect)) continue;
-            
-            // std::cout << "Mesh intersect: Some triangle intersects " << face_it->FaceID << " intersects the ray" << std::endl;
+            if (TriangleIntersect(r, *face_it, isect)){
+                // std::cout << "Mesh intersect: Some triangle intersects " << face_it->FaceID << " intersects the ray" << std::endl;
 
-            intersect = true;
-            if (curr_isect.depth < min_depth) {  // this is closer
-                min_depth = curr_isect.depth;
-                min_isect = curr_isect;
+                intersect = true;
+                if (isect->depth < min_depth) {  // this is closer
+                    std::cout << "Mesh intersect: Some triangle intersects " << face_it->FaceID << " intersects the ray" << std::endl;
+                    min_depth = isect->depth;
+                    min_isect = *isect;
+                }
             }
+            
         }
     }
 
