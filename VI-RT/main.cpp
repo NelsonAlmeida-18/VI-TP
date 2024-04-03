@@ -18,6 +18,8 @@
 #include "PointLight.hpp"
 #include "AreaLight.hpp"
 
+#include "PointLightShader.hpp"
+
 #include <time.h>
 
 int main(int argc, const char * argv[]) {
@@ -29,49 +31,73 @@ int main(int argc, const char * argv[]) {
     clock_t start, end;
     double cpu_time_used;
     
-    success = scene.Load("/home/gustavo/cg/VI-TP/VI-RT/utils/cornell-box.obj");
     
+    if (argc>1) {
+        // load the scene
+        success = scene.Load(argv[1]);
+    } else {
+        // load the default scene
+        success = scene.Load("/Users/rkeat/Desktop/Universidade/1anoMestrado/2semestre/VI-TP/VI-RT/utils/cornell-box.obj");
+    }
+
     if (!success) {
         std::cout << "ERROR!! :o\n";
         return 1;
     }
     std::cout << "Scene Load: SUCCESS!! :-)\n";
-    scene.printSummary();
     std::cout << std::endl;
+
+    
     
     // add an ambient light to the scene
-    AmbientLight ambient(RGB(0.9,0.9,0.9));
+    AmbientLight ambient(RGB(0.4,0.4,0.4));
     scene.lights.push_back(&ambient);
     scene.numLights++;
     
+    // Lets position this light in the ceiling where the light source is
+    PointLight light1(RGB(0.7,0.1,0.1), Point(273, 495, 279), 200.0);
+    scene.lights.push_back(&light1);
+    scene.numLights++;
+
+    scene.printSummary();
+
     // Image resolution
     const int W= 640;
-    const int H= 480;
+    const int H= 640;
     
     img = new ImagePPM(W,H);
-    
+
     // Camera parameters
-    const Point Eye ={0,0,0}, At={0,0,1};
+    const Point Eye ={280.0, 375.0, -830.0}, At={280.0, 265.0, 280.0};
     const Vector Up={0,1,0};
-    const float fovW = 60.f;
-    const float fovH = fovW * (float)H/(float)W;  // in degrees
-    const float fovWrad = fovW*3.14f/180.f, fovHrad = fovH*3.14f/180.f;    // to radians
-    cam = new Perspective(Eye, At, Up, W, H, fovWrad, fovHrad);
-    
+    const float fovW = 45.0, fovH = 45.0;
+    cam = new Perspective(Eye, At, Up, W, H, fovW, fovH);
+
+    BB bb; // Create an instance of the BB c d dlass
+    bool resultOfAABB = bb.testAABBIntersect(); // Call the testAABBIntersect() function on the instance
+    std::cout << "Result of AABB test: " << resultOfAABB << std::endl; // Print the result of the test
+
     // create the shader
     RGB background(0.05, 0.05, 0.55);
+
     shd = new AmbientShader(&scene, background);
+
+    std::cout << "Shader created\n";
     // declare the renderer
     int spp=1;     // samples per pixel
+
     StandardRenderer myRender (cam, &scene, img, shd, spp);
     // render
     start = clock();
+    std::cout << "Rendering\n";
     myRender.Render();
+    std::cout << "Rendered\n";
     end = clock();
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
 
     // save the image
-    img->Save("MyImage.ppm");
+    img->Save("./MyImage.ppm");
+
     
     fprintf (stdout, "Rendering time = %.3lf secs\n\n", cpu_time_used);
     

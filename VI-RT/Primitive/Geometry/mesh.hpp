@@ -15,6 +15,7 @@
 // partially inspired in pbrt book (3rd ed.), sec 3.6, pag 152
 
 typedef struct Face {
+    int FaceID;                 // face ID
     int vert_ndx[3];            // indices to our internal vector of vertices (in Mesh)
     Vector geoNormal;           // geometric normal
     bool hasShadingNormals;     // are there per vertex shading normals ??
@@ -34,8 +35,7 @@ public:
     int numNormals;
     std::vector<Vector> normals;
     bool intersect (Ray r, Intersection *isect);
-    
-    Mesh(): numFaces(0), numVertices(0), numNormals(0) {}
+    Mesh(): numFaces(0), numVertices(0), numNormals(0) {};
 };
 
 #endif /* mesh_hpp */

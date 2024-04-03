@@ -34,11 +34,24 @@
         // Heron's formula
         // https://www.mathopenref.com/heronsformula.html
         float area () {
-            
-            // ...
-            
-            //const float A = ...
-            const float A = 1.f;
+
+            const float ax = v1.X-v2.X;
+            const float ay = v1.Y-v2.Y;
+            const float az = v1.Z-v2.Z;
+            const float aSize = sqrt(ax*ax + ay*ay + az*az);
+
+            const float bx = v2.X-v3.X;
+            const float by = v2.Y-v3.Y;
+            const float bz = v2.Z-v3.Z;
+            const float bSize = sqrt(bx*bx + by*by + bz*bz);
+
+            const float cx = v3.X-v1.X;
+            const float cy = v3.Y-v1.Y;
+            const float cz = v3.Z-v1.Z;
+            const float cSize = sqrt(cx*cx + cy*cy + cz*cz);
+
+            const float p = (aSize + bSize + cSize) / 2.f;
+            const float A = sqrt(p*(p-aSize)*(p-bSize)*(p-cSize));
 
             return A;
         }

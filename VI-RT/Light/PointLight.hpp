@@ -14,7 +14,9 @@ class PointLight: public Light {
 public:
     RGB color;
     Point pos;
-    PointLight (RGB _color, Point _pos): color(_color), pos(_pos) { type = POINT_LIGHT; }
+    float intensity=1;
+    PointLight (RGB _color, Point _pos): color(_color), pos(_pos) { type = POINT_LIGHT;}
+    PointLight (RGB _color, Point _pos, float _intensity): color(_color), pos(_pos), intensity(_intensity) { type = POINT_LIGHT;}
     ~PointLight () {}
     // return the Light RGB radiance for a given point : p
     RGB L (Point p) {return color;}

@@ -15,10 +15,10 @@
 class Geometry {
 public:
     Geometry () {}
-    ~Geometry () {}
+    virtual ~Geometry () {}
     // return True if r intersects this geometric primitive
     // returns data about intersection on isect
-    bool intersect (Ray r, Intersection *isect) { return false; }
+    virtual bool intersect (Ray r, Intersection *isect) { return false; };
     //Bidirectional reflectance distribution function
     //É uma função que define como a luz de uma fonte é refletina numa superficie opaca
     BRDF f;

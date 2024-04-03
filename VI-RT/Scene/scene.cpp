@@ -12,11 +12,12 @@
 #include "primitive.hpp"
 #include "mesh.hpp"
 #include "Phong.hpp"
+#include "vector.hpp"
 
 #include <iostream>
 #include <set>
-#include <vector>
-#include <regex>
+#include <stdio.h>
+#include <unordered_map>
 
 using namespace tinyobj;
 
@@ -67,101 +68,143 @@ bool Scene::Load (const std::string &fname) {
     //Verify if the file passed is a .obj or a .mtl file
     if (fname.find(".obj") != std::string::npos) {
         // Load the .obj file
-        if (!LoadObj(fname)) {
-            return false;
-        }
+
+        return LoadObj(fname);
     }
-    else if (fname.find(".mtl") != std::string::npos) {
-        // Load the .mtl file
-        if (!LoadMtl(fname)) {
-            return false;
-        }
-    }
-    else {
-        return false;
-    }
-    
-    // your code here
-    return true;
+    return false;
 }
 
-bool Scene::LoadObj(const std::string &fname) {
-    ObjReader myObjReader;
-    if (!myObjReader.ParseFromFile(fname)) 
-        return false;
-    
-    const tinyobj::attrib_t attrib = myObjReader.GetAttrib();
-    // Obj structure:
-    // List of geometric vertices with x,y,z coordinates
-    // v x y z
-    // List of texture coordinates with u,[v,w] in [0 ... 1]
-    //vt u [v[w]]
-    // List of vertex normals with x,y,z coordinates
-    //vn x y z
-    // Which materials definition file to use
-    //mtllib [filename]
-    //wich material to use in the subsequent objets
-    //usemtl [material_name]
-    // group subsequent faces onto an object
-    //o [object_name]
-    //Polygonal face element f v1/vt1/vn1 v2/vt2/vn2 v3/vt3/vn3
-    //arguments are the vertices indices according to their order in the file
-    // f 1 2 4
-    // f 3/1 4/2 5/3
-    // f 6//3 2//1 7//2
 
-    //Lets start by identifying the regex of the file structure
-    std::regex vertex_pattern(R"(v\s+([\d\.-]+)\s+([\d\.-]+)\s+([\d\.-]+))");
-    std::regex texture_pattern(R"(vt\s+([\d\.-]+)\s+([\d\.-]+)\s*([\d\.-]+)?)");
-    std::regex normal_pattern(R"(vn\s+([\d\.-]+)\s+([\d\.-]+)\s+([\d\.-]+))");
-    std::regex material_pattern(R"(mtllib\s+([\w\.]+))");
-    std::regex usemtl_pattern(R"(usemtl\s+([\w]+))");
-    std::regex object_pattern(R"(o\s+([\w]+))");
-    std::regex face_pattern(R"(f\s+([\d]+)(?:/([\d]+))?(?:/([\d]+))?(\s+([\d]+)(?:/([\d]+))?(?:/([\d]+))?)(?:\s+([\d]+)(?:/([\d]+))?(?:/([\d]+))?)?)");
+bool Scene::LoadObj(const std::string& fname) {
 
-    std::ifstream file(fname);
-    if (file.is_open()){
-        std::string line;
-        while (std::getline(file, line)){
-            std::smatch match;
-            if (std::regex_match(line, match, vertex_pattern)){
-                //std::cout << "Vertex: " << match[1] << " " << match[2] << " " << match[3] << std::endl;
-            }
-            else if (std::regex_match(line, match, texture_pattern)){
-                //std::cout << "Texture: " << match[1] << " " << match[2] << " " << match[3] << std::endl;
-            }
-            else if (std::regex_match(line, match, normal_pattern)){
-                //std::cout << "Normal: " << match[1] << " " << match[2] << " " << match[3] << std::endl;
-            }
-            else if (std::regex_match(line, match, material_pattern)){
-                //std::cout << "Material: " << match[1] << std::endl;
-            }
-            else if (std::regex_match(line, match, usemtl_pattern)){
-                //std::cout << "Usemtl: " << match[1] << std::endl;
-            }
-            else if (std::regex_match(line, match, object_pattern)){
-                //std::cout << "Object: " << match[1] << std::endl;
-            }
-            else if (std::regex_match(line, match, face_pattern)){
-                //std::cout << "Face: " << match[1] << " " << match[2] << " " << match[3] << std::endl;
-            }
+    tinyobj::ObjReader reader;
+    int FaceID=0; 
+
+    if (!reader.ParseFromFile(fname)) {
+        if (!reader.Error().empty()) {
+            std::cerr << "TinyObjReader: " << reader.Error();
         }
-    }
-    else {
-        std::cerr << "Error: Could not open file " << fname << std::endl;
         return false;
     }
 
-    return true;
-}
+    if (!reader.Warning().empty()) {
+        std::cout << "TinyObjReader: " << reader.Warning();
+    }
 
-bool Scene::LoadMtl(const std::string &fname) {
-    ObjReader myObjReader;
-    if (!myObjReader.ParseFromFile(fname)) 
-        return false;
-    
-    const tinyobj::attrib_t attrib = myObjReader.GetAttrib();
-    
+    auto& attrib = reader.GetAttrib();
+    auto& shapes = reader.GetShapes();
+    auto& materials = reader.GetMaterials();
+
+
+    // Each shape is one mesh
+    // Lets iterate over shapes/meshes
+    for (auto shape : shapes) {
+
+        auto mat = &materials[shape.mesh.material_ids[0]];
+        Phong *phong = new Phong();
+        // Ambient component
+        phong->Ka.R = mat->ambient[0];
+        phong->Ka.G = mat->ambient[1];
+        phong->Ka.B = mat->ambient[2];
+        // Diffuse component
+        phong->Kd.R = mat->diffuse[0];
+        phong->Kd.G = mat->diffuse[1];
+        phong->Kd.B = mat->diffuse[2];
+        // Specular component
+        phong->Ks.R = mat->specular[0];
+        phong->Ks.G = mat->specular[1];
+        phong->Ks.B = mat->specular[2];
+        // Transmittance
+        phong->Kt.R = mat->transmittance[0];
+        phong->Kt.G = mat->transmittance[1];
+        phong->Kt.B = mat->transmittance[2];
+        // Shininess 
+        phong->Ns = mat->shininess;
+        
+
+        Mesh *mesh = new Mesh();
+        Primitive *prim = new Primitive();
+        prim->g = mesh;
+        // Lets assume all faces in the mesh have the same material
+        prim->material_ndx = numBRDFs;
+
+        // The primitives geomtry bounding box is calculated on the fly
+        const int V1st = shape.mesh.indices[0].vertex_index;
+        mesh->bb.min.set(attrib.vertices[V1st], attrib.vertices[V1st+1], attrib.vertices[V1st+2]);
+        mesh->bb.max.set(attrib.vertices[V1st], attrib.vertices[V1st+1], attrib.vertices[V1st+2]);
+
+
+
+        // Lets loop over all the faces and vertices
+        std::unordered_map<int, Point> vertices_rehash;
+        int indexOffset=0;
+        for (size_t faceNum = 0; faceNum<shape.mesh.num_face_vertices.size(); faceNum++){
+            size_t numVerticesPerFace = size_t(shape.mesh.num_face_vertices[faceNum]);
+            
+            Face *f = new Face();
+            Phong *newMat = new Phong(*phong);
+
+            Point myVtcs[3];
+
+            // Lets get the vertices in the face
+            for (size_t vertexNum=0; vertexNum<numVerticesPerFace; vertexNum++) {
+                auto index = shape.mesh.indices[indexOffset+vertexNum];
+                
+                auto vx = attrib.vertices[3*index.vertex_index+0];
+                auto vy = attrib.vertices[3*index.vertex_index+1];
+                auto vz = attrib.vertices[3*index.vertex_index+2];
+
+                Point newPoint(vx, vy, vz);
+                myVtcs[vertexNum] = newPoint;
+
+                if (vertexNum==0){
+                    f->bb.min.set(myVtcs[0].X, myVtcs[0].Y, myVtcs[0].Z);
+                    f->bb.max.set(myVtcs[0].X, myVtcs[0].Y, myVtcs[0].Z);
+                }
+                else f->bb.update(newPoint);
+
+                f->vert_ndx[vertexNum] = mesh->vertices.size();
+
+                // Lets add the face to vertex
+                // If the vertex is new then add it to the mesh
+                // auto known_vert = vertices_rehash.find(index.vertex_index);
+
+                // if (known_vert == vertices_rehash.end()) {
+                //     // New vertex, add it to the mesh
+                //     vertices_rehash.insert(std::make_pair(index.vertex_index, newPoint));
+                //     mesh->vertices.push_back(newPoint);
+                //     mesh->numVertices++;
+                // } else {
+                //     // Vertex already exists
+                //     f->vert_ndx[vertexNum] = std::distance(vertices_rehash.begin(), known_vert);
+                // }
+                mesh->vertices.push_back(newPoint);
+                mesh->numVertices++;
+            }
+
+            // add face to mesh and compute the geometric normal
+            Vector v1 = myVtcs[0].vec2point(myVtcs[1]);
+            Vector v2 = myVtcs[0].vec2point(myVtcs[2]);
+
+            Vector normal = v1.cross(v2);
+            normal.normalize();
+            f->geoNormal.set(normal);
+            f->FaceID = FaceID++;
+
+            mesh->faces.push_back(*f);
+            mesh->numFaces++;
+            indexOffset += numVerticesPerFace;
+        }
+
+        // Add primitives to the scene
+        prims.push_back(prim);
+        numPrimitives++;
+
+        // Add materials to the scene
+        BRDFs.push_back(phong);
+        numBRDFs++;
+
+    }
 
     return true;
 }
@@ -171,21 +214,23 @@ bool Scene::trace (Ray r, Intersection *isect) {
     bool intersection = false;    
     
     if (numPrimitives==0) return false;
-    
+
+    // initialize isect->depth to a large value
+    isect->depth = std::numeric_limits<float>::max();
+
     // iterate over all primitives
     for (auto prim_itr = prims.begin() ; prim_itr != prims.end() ; prim_itr++) {
+
         if ((*prim_itr)->g->intersect(r, &curr_isect)) {
-            if (!intersection) { // first intersection
+
+            if (curr_isect.depth < isect->depth) { // closest intersection
                 intersection = true;
-                *isect = curr_isect;
-                isect->f = BRDFs[(*prim_itr)->material_ndx];
-            }
-            else if (curr_isect.depth < isect->depth) {
                 *isect = curr_isect;
                 isect->f = BRDFs[(*prim_itr)->material_ndx];
             }
         }
     }
+
     return intersection;
 }
 
