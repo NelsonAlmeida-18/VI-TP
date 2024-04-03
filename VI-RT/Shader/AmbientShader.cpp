@@ -7,6 +7,11 @@
 
 #include "AmbientShader.hpp"
 #include "Phong.hpp"
+#include "PointLight.hpp"
+#include "AmbientLight.hpp"
+#include <iostream>
+#include <stdio.h>
+#include <math.h>  
 
 RGB AmbientShader::shade(bool intersected, Intersection isect, int depth) {
     RGB color(0.,0.,0.);
@@ -30,13 +35,31 @@ RGB AmbientShader::shade(bool intersected, Intersection isect, int depth) {
     // Loop over scene's light sources and process Ambient Lights
     for (auto light_itr = scene->lights.begin() ; light_itr != scene->lights.end() ; light_itr++) {
         
-        if ((*light_itr)->type == AMBIENT_LIGHT) {  // is it an ambient light ?
+        if ((*light_itr)->type == AMBIENT_LIGHT) { 
+            // It is a ambient light
             color += Ka * (*light_itr)->L();
             continue;
         }
         else if((*light_itr)->type == POINT_LIGHT){
-            // TODO: TOIMPLEMENT
-            continue;
+            // https://learnopengl.com/Lighting/Multiple-lights
+
+            
+            // It is a point light
+            // The pointlight is a point that iluminates in all directions with a certain intensity
+            PointLight *light = (PointLight *)(*light_itr);
+            // Lets get the light direction
+            Point auxLightDir = light->pos - isect.p;
+            Vector lightDir(auxLightDir.X, auxLightDir.Y, auxLightDir.Z);
+            lightDir.normalize();
+            
+            // Light atenuation based in the inverse square law (inverse of their distance squared)
+            float distance = lightDir.norm();
+            float attenuation = 1.0 / (0 + 0.2*distance+ 0.5* distance * distance);
+
+            // Point light intensity = base intensity * attenuation
+            RGB ambient = Ka * light->color * attenuation;
+            RGB difuse = f->Kd * light->color * attenuation * fmax(0.0, isect.gn.dot(lightDir));
+            color += ambient + difuse;
         }
     }
         

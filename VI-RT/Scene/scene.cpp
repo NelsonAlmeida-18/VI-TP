@@ -68,16 +68,10 @@ bool Scene::Load (const std::string &fname) {
     //Verify if the file passed is a .obj or a .mtl file
     if (fname.find(".obj") != std::string::npos) {
         // Load the .obj file
-        if (!LoadObj(fname)) {
-            return false;
-        }
+
+        return LoadObj(fname);
     }
-    else {
-        return false;
-    }
-    
-    // your code here
-    return true;
+    return false;
 }
 
 

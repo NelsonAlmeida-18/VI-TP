@@ -48,13 +48,13 @@ int main(int argc, const char * argv[]) {
     
     
     // add an ambient light to the scene
-    AmbientLight ambient(RGB(0.5,0.5,0.5));
+    AmbientLight ambient(RGB(0.7,0.7,0.7));
     scene.lights.push_back(&ambient);
     scene.numLights++;
     
-    PointLight light1(RGB(1,1,1), Point(273, 495, 279));
-    scene.lights.push_back(&light1);
-    scene.numLights++;
+    // PointLight light1(RGB(0.2,0.2,0.2), Point(273, 495, 279));
+    // scene.lights.push_back(&light1);
+    // scene.numLights++;
 
     scene.printSummary();
 
