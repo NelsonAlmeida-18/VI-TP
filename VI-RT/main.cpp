@@ -45,14 +45,6 @@ int main(int argc, const char * argv[]) {
     std::cout << "Scene Load: SUCCESS!! :-)\n";
     std::cout << std::endl;
 
-
-    // For each face in the scene lets display the material index, material colors, face id and vertices
-    for(auto *prim: scene.prims){
-        std::cout << "Face ID: " << prim->g << std::endl;
-        std::cout << "Material Index: " << prim->material_ndx << std::endl;
-        Phong *f = (Phong *)scene.BRDFs[prim->material_ndx];
-        std::cout << "Material Colors: " << f->Ka.R << " " << f->Ka.G << " " << f->Ka.B << std::endl;
-    }
     
     
     // add an ambient light to the scene
