@@ -18,9 +18,9 @@
 #include "BRDF.hpp"
 
 class Scene {
+public:
     std::vector <Primitive *> prims;
     std::vector <BRDF *> BRDFs;
-public:
     std::vector <Light *> lights;
     int numPrimitives, numLights, numBRDFs;
 

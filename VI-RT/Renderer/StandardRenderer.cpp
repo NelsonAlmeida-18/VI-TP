@@ -33,13 +33,11 @@ void StandardRenderer::Render () {
             cam->GenerateRay(x,y,&primary);
             
             // trace ray (scene)
-            // bool trace (Ray r, Intersection *isect);
             intersected = scene->trace(primary, &isect);
 
             if (!intersected) continue; // no intersection, continue with next ray
-            //std::cout << "Intersection at pixel (" << x << "," << y << ")\n";
-            // shade this intersection (shader) - remember: depth=0
-            //std::cout << "Shading at pixel (" << x << "," << y << ")\n";
+
+            // Shade 
             color = shd->shade(intersected, isect, depth);
             
             // write the result into the image frame buffer (image)

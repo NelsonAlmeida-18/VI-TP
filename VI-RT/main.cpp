@@ -37,19 +37,33 @@ int main(int argc, const char * argv[]) {
         // load the default scene
         success = scene.Load("/Users/rkeat/Desktop/Universidade/1anoMestrado/2semestre/VI-TP/VI-RT/utils/cornell-box.obj");
     }
-    
+
     if (!success) {
         std::cout << "ERROR!! :o\n";
         return 1;
     }
     std::cout << "Scene Load: SUCCESS!! :-)\n";
     std::cout << std::endl;
+
+
+    // For each face in the scene lets display the material index, material colors, face id and vertices
+    for(auto *prim: scene.prims){
+        std::cout << "Face ID: " << prim->g << std::endl;
+        std::cout << "Material Index: " << prim->material_ndx << std::endl;
+        Phong *f = (Phong *)scene.BRDFs[prim->material_ndx];
+        std::cout << "Material Colors: " << f->Ka.R << " " << f->Ka.G << " " << f->Ka.B << std::endl;
+    }
+    
     
     // add an ambient light to the scene
     AmbientLight ambient(RGB(0.5,0.5,0.5));
     scene.lights.push_back(&ambient);
     scene.numLights++;
     
+    PointLight light1(RGB(1,1,1), Point(273, 495, 279));
+    scene.lights.push_back(&light1);
+    scene.numLights++;
+
     scene.printSummary();
 
     // Image resolution

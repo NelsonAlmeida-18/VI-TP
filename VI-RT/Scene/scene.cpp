@@ -126,17 +126,13 @@ bool Scene::LoadObj(const std::string& fname) {
         phong->Kt.B = mat->transmittance[2];
         // Shininess 
         phong->Ns = mat->shininess;
-
-
-        BRDFs.push_back(phong);
-        numBRDFs++;
         
 
         Mesh *mesh = new Mesh();
         Primitive *prim = new Primitive();
         prim->g = mesh;
         // Lets assume all faces in the mesh have the same material
-        prim->material_ndx = shape.mesh.material_ids[0];
+        prim->material_ndx = numBRDFs;
 
         // The primitives geomtry bounding box is calculated on the fly
         const int V1st = shape.mesh.indices[0].vertex_index;
@@ -152,6 +148,8 @@ bool Scene::LoadObj(const std::string& fname) {
             size_t numVerticesPerFace = size_t(shape.mesh.num_face_vertices[faceNum]);
             
             Face *f = new Face();
+            Phong *newMat = new Phong(*phong);
+
             Point myVtcs[3];
 
             // Lets get the vertices in the face
@@ -201,42 +199,18 @@ bool Scene::LoadObj(const std::string& fname) {
 
             mesh->faces.push_back(*f);
             mesh->numFaces++;
-            // std::cout << "Face " << faceNum << " has " << numVerticesPerFace << " vertices" << std::endl;
             indexOffset += numVerticesPerFace;
-
         }
-            
+
         // Add primitives to the scene
         prims.push_back(prim);
         numPrimitives++;
 
-        std::cout << "Mesh " << shape.name <<  FaceID << " has " << mesh->numVertices << " vertices and " << mesh->faces.size() << " faces" << std::endl;
-        std::cout << "Mesh material id" << BRDFs.size() << std::endl;
-        std::cout << "Material color" << mat->ambient[0] << " " << mat->ambient[1] << " " << mat->ambient[2] << std::endl;
-        // for (auto f : mesh->faces) {
-        //     // Lets print the vertices coordinates for each face
-        //     if(f.FaceID==6){ 
-        //         // std::cout << "Face " << f.FaceID << " has vertices: ";
-                
-        //         for (int i=0; i<3; i++) {
-                
-        //             std::cout << "Vertice index" << i << " "<< mesh->vertices[f.vert_ndx[i]].X << " " << mesh->vertices[f.vert_ndx[i]].Y << " " << mesh->vertices[f.vert_ndx[i]].Z << " ";
-        //         }
-        //         std::cout << "Face has color " << mat->ambient[0] << " " << mat->ambient[1] << " " << mat->ambient[2] << std::endl;
-        //     }
-        // }
+        // Add materials to the scene
+        BRDFs.push_back(phong);
+        numBRDFs++;
 
-        // Lets print every face bounding box
-        // for (auto f : mesh->faces) {
-        //     std::cout << "Face " << f.FaceID << " has bounding box min: " << f.bb.min.X << " " << f.bb.min.Y << " " << f.bb.min.Z << " and max: " << f.bb.max.X << " " << f.bb.max.Y << " " << f.bb.max.Z << std::endl;
-        // }
     }
-
-    // Lets print the materials indexes of the scene
-    // for (int i=0; i<BRDFs.size(); i++) {
-    //     std::cout << "Material index " << i << " has ambient color "  << std::endl;
-    // }
-
 
     return true;
 }

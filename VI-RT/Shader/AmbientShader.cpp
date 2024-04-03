@@ -17,10 +17,6 @@ RGB AmbientShader::shade(bool intersected, Intersection isect, int depth) {
         return (background);
     }
 
-    // pus aqui uma negação porque estava sempre a cair neste return
-    if (!isect.isLight) { // intersection with a light source
-        return isect.Le;
-    }
     
     // verify whether the intersected object has an ambient component
     Phong *f = (Phong *)isect.f;
@@ -28,8 +24,6 @@ RGB AmbientShader::shade(bool intersected, Intersection isect, int depth) {
     //std::cout << "Ambient Light Ka " << Ka.R << " " << Ka.G << " " << Ka.B << "\n";
     if (f->Ka.isZero()) return color;
     
-
-    // if (f->Ka.B > 0) std::cout << "Face " << isect.FaceID << " has ambient color " << f->Ka.R << " " << f->Ka.G << " " << f->Ka.B << "\n";
     
     
     // ambient shade
@@ -37,8 +31,11 @@ RGB AmbientShader::shade(bool intersected, Intersection isect, int depth) {
     for (auto light_itr = scene->lights.begin() ; light_itr != scene->lights.end() ; light_itr++) {
         
         if ((*light_itr)->type == AMBIENT_LIGHT) {  // is it an ambient light ?
-            RGB src = (*light_itr)->L();
             color += Ka * (*light_itr)->L();
+            continue;
+        }
+        else if((*light_itr)->type == POINT_LIGHT){
+            // TODO: TOIMPLEMENT
             continue;
         }
     }
