@@ -18,6 +18,8 @@
 #include "PointLight.hpp"
 #include "AreaLight.hpp"
 
+#include "PointLightShader.hpp"
+
 #include <time.h>
 
 int main(int argc, const char * argv[]) {
@@ -48,13 +50,14 @@ int main(int argc, const char * argv[]) {
     
     
     // add an ambient light to the scene
-    AmbientLight ambient(RGB(0.7,0.7,0.7));
+    AmbientLight ambient(RGB(0.4,0.4,0.4));
     scene.lights.push_back(&ambient);
     scene.numLights++;
     
-    // PointLight light1(RGB(0.2,0.2,0.2), Point(273, 495, 279));
-    // scene.lights.push_back(&light1);
-    // scene.numLights++;
+    // Lets position this light in the ceiling where the light source is
+    PointLight light1(RGB(0.7,0.1,0.1), Point(273, 495, 279), 200.0);
+    scene.lights.push_back(&light1);
+    scene.numLights++;
 
     scene.printSummary();
 
@@ -76,7 +79,9 @@ int main(int argc, const char * argv[]) {
 
     // create the shader
     RGB background(0.05, 0.05, 0.55);
+
     shd = new AmbientShader(&scene, background);
+
     std::cout << "Shader created\n";
     // declare the renderer
     int spp=1;     // samples per pixel

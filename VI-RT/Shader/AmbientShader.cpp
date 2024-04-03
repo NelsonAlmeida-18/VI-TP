@@ -43,23 +43,41 @@ RGB AmbientShader::shade(bool intersected, Intersection isect, int depth) {
         else if((*light_itr)->type == POINT_LIGHT){
             // https://learnopengl.com/Lighting/Multiple-lights
 
-            
+
             // It is a point light
             // The pointlight is a point that iluminates in all directions with a certain intensity
             PointLight *light = (PointLight *)(*light_itr);
+            float lightIntensity = light->intensity;
+
             // Lets get the light direction
             Point auxLightDir = light->pos - isect.p;
             Vector lightDir(auxLightDir.X, auxLightDir.Y, auxLightDir.Z);
-            lightDir.normalize();
-            
-            // Light atenuation based in the inverse square law (inverse of their distance squared)
-            float distance = lightDir.norm();
-            float attenuation = 1.0 / (0 + 0.2*distance+ 0.5* distance * distance);
 
-            // Point light intensity = base intensity * attenuation
-            RGB ambient = Ka * light->color * attenuation;
-            RGB difuse = f->Kd * light->color * attenuation * fmax(0.0, isect.gn.dot(lightDir));
-            color += ambient + difuse;
+
+            auto lightDist = lightDir.norm();
+            lightDir.normalize();
+
+            Vector geoNormal = isect.gn;
+            geoNormal.normalize();
+        
+
+            Point rayorigin = isect.p + geoNormal * 0.001;
+            Ray shadowRay(rayorigin, lightDir);
+
+            // Check if the shadow ray intersects any object
+            Intersection shadowIsect;
+            bool shadowIntersected = scene->trace(shadowRay, &shadowIsect);
+            if (!shadowIntersected || shadowIsect.depth > lightDist) {
+                // If the shadow ray intersects an object, the point is in shadow
+                // We will use linear attenuation therefore the intensity of the light will decrease with the distance
+                float attenuation = 1/(lightDist);
+
+                RGB colorInSpot = light->color * f->Kd;
+                float intensityMultiplier = light->intensity* attenuation ;
+
+                color+=colorInSpot * intensityMultiplier;
+            }
+        
         }
     }
         
