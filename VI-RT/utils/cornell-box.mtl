@@ -17,7 +17,7 @@ Ks 0 0 0
 newmtl blue
 Ka 0 0 1
 Kd 0 0 1
-Ks 0 0 0
+Ks 1 1 1
 
 
 newmtl light

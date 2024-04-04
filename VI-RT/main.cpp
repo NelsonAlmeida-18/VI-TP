@@ -50,12 +50,12 @@ int main(int argc, const char * argv[]) {
     
     
     // add an ambient light to the scene
-    AmbientLight ambient(RGB(0.4,0.4,0.4));
-    scene.lights.push_back(&ambient);
-    scene.numLights++;
+    // AmbientLight ambient(RGB(0.4,0.4,0.4));
+    // scene.lights.push_back(&ambient);
+    // scene.numLights++;
     
     // Lets position this light in the ceiling where the light source is
-    PointLight light1(RGB(0.7,0.1,0.1), Point(273, 495, 279), 200.0);
+    PointLight light1(RGB(0.7,0.7,0.7), Point(273, 495, 279), 200.0);
     scene.lights.push_back(&light1);
     scene.numLights++;
 
