@@ -5,7 +5,7 @@
 # empty line including some space
    
 
-mtllib cornell-box.mtl
+mtllib cornell_box_vi.mtl
 
 o floor
 usemtl white

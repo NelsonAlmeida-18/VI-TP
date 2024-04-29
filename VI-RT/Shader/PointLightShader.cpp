@@ -73,39 +73,6 @@ RGB PointLightShader::shade(bool intersected, Intersection isect, int depth) {
             std::cout << "Color: " << color.R << " " << color.G << " " << color.B << "\n";
             std::cout << "Attenuation factor" << 0 << "\n";
 
-            //             // Point rayorigin = isect.p + 0.001 * lightDir;
-            // Point rayorigin = isect.p + 0.001 * lightDir;
-            // Ray shadowRay(rayorigin, lightDir);
-
-            // // Check if the shadow ray intersects any object
-            // Intersection shadowIsect;
-            // bool shadowIntersected = scene->trace(shadowRay, &shadowIsect);
-            // if (shadowIntersected) {
-            //     // If the shadow ray intersects an object, the point is in shadow
-            //     continue;
-            // }
-
-            // // Light atenuation based in the inverse square law (inverse of their distance squared)
-            // float distance = lightDir.norm();
-            // float attenuation = 1.0 / (distance * distance);
-
-
-            // // Diffuse shading
-            // RGB Kd = f->Kd;
-            // float diffuseFactor = std::max(0.0f, lightDir.dot(isect.sn));
-            // color += Kd * diffuseFactor * lightIntensity * attenuation;
-
-            
-            // // Specular shading
-            // RGB Ks = f->Ks;
-            // float specularFactor = 0.0;
-            // if (diffuseFactor > 0) {
-            //     Vector viewDir = -isect.wo; // Assuming ray direction points towards viewer
-            //     // We use sn instead of gn because we want the shading normal
-            //     Vector reflectDir = lightDir - 2 * (lightDir.dot(isect.sn)) * isect.sn;
-            //     specularFactor = powf(std::max(0.0f, viewDir.dot(reflectDir)), f->Ns);
-            // }
-            // color += Ks * specularFactor * lightIntensity * attenuation;
         }
     }
         

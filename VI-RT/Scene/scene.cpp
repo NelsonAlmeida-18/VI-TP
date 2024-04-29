@@ -133,8 +133,6 @@ bool Scene::LoadObj(const std::string& fname) {
         mesh->bb.min.set(attrib.vertices[V1st], attrib.vertices[V1st+1], attrib.vertices[V1st+2]);
         mesh->bb.max.set(attrib.vertices[V1st], attrib.vertices[V1st+1], attrib.vertices[V1st+2]);
 
-
-
         // Lets loop over all the faces and vertices
         std::unordered_map<int, Point> vertices_rehash;
         int indexOffset=0;
@@ -142,7 +140,6 @@ bool Scene::LoadObj(const std::string& fname) {
             size_t numVerticesPerFace = size_t(shape.mesh.num_face_vertices[faceNum]);
             
             Face *f = new Face();
-            Phong *newMat = new Phong(*phong);
 
             Point myVtcs[3];
 

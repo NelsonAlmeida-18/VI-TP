@@ -30,7 +30,11 @@ void StandardRenderer::Render () {
             int depth = 0;
           
             // Generate Ray (camera)
-            cam->GenerateRay(x,y,&primary);
+            // Jitter is a random number between -0.1 and 0.1
+            float jitter = (rand() % 100) / 1000.0 - 0.05;
+            jitter=0;
+            // std::cout << "Jitter " << jitter << "\n";
+            cam->GenerateRay(x,y,&primary, &jitter);
             
             // trace ray (scene)
             intersected = scene->trace(primary, &isect);

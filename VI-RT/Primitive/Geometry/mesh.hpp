@@ -36,6 +36,7 @@ public:
     std::vector<Vector> normals;
     bool intersect (Ray r, Intersection *isect);
     Mesh(): numFaces(0), numVertices(0), numNormals(0) {};
+
 };
 
 #endif /* mesh_hpp */

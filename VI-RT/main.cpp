@@ -37,7 +37,7 @@ int main(int argc, const char * argv[]) {
         success = scene.Load(argv[1]);
     } else {
         // load the default scene
-        success = scene.Load("/Users/rkeat/Desktop/Universidade/1anoMestrado/2semestre/VI-TP/VI-RT/utils/cornell-box.obj");
+        success = scene.Load("/Users/rkeat/Desktop/Universidade/1anoMestrado/2semestre/VI-TP/VI-RT/utils/cornell_box_vi.obj");
     }
 
     if (!success) {
@@ -50,13 +50,29 @@ int main(int argc, const char * argv[]) {
     
     
     // add an ambient light to the scene
-    // AmbientLight ambient(RGB(0.4,0.4,0.4));
-    // scene.lights.push_back(&ambient);
-    // scene.numLights++;
+    AmbientLight ambient(RGB(0.04,0.04,0.04));
+    scene.lights.push_back(&ambient);
+    scene.numLights++;
     
     // Lets position this light in the ceiling where the light source is
-    PointLight light1(RGB(0.7,0.7,0.7), Point(273, 495, 279), 200.0);
+    PointLight light1(RGB(0.65,0.65,0.65), Point(288, 508, 282), 100.0);
     scene.lights.push_back(&light1);
+    scene.numLights++;
+
+    PointLight light2(RGB(0.65,0.65,0.65), Point(248, 508, 242), 200.0);
+    scene.lights.push_back(&light2);
+    scene.numLights++;
+
+    PointLight light3(RGB(0.65,0.65,0.65), Point(328, 508, 242), 200.0);
+    scene.lights.push_back(&light3);
+    scene.numLights++;
+
+    PointLight light4(RGB(0.65,0.65,0.65), Point(248, 508, 322), 200.0);
+    scene.lights.push_back(&light4);
+    scene.numLights++;
+
+    PointLight light5(RGB(0.65,0.65,0.65), Point(328, 508, 322), 200.0);
+    scene.lights.push_back(&light5);
     scene.numLights++;
 
     scene.printSummary();
@@ -80,11 +96,12 @@ int main(int argc, const char * argv[]) {
     // create the shader
     RGB background(0.05, 0.05, 0.55);
 
-    shd = new AmbientShader(&scene, background);
+    // shd = new AmbientShader(&scene, background);
+    shd = new WhittedShader(&scene, background);
 
     std::cout << "Shader created\n";
     // declare the renderer
-    int spp=1;     // samples per pixel
+    int spp=4;     // samples per pixel
 
     StandardRenderer myRender (cam, &scene, img, shd, spp);
     // render
