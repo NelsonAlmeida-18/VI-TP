@@ -15,12 +15,12 @@ bool Perspective::GenerateRay(const int x, const int y, Ray *r, const float *cam
     r->o = Eye;
 
     // Lets add the jitter to the x and y
-    float jitter = *cam_jitter;
+    
     // Theta h = Fovy
     // Theta w = Fovx
     // Lets define the ray 
-    float xs = (2*(x+0.5+jitter)/W)-1;
-    float ys =((2*(H-y-1)+0.5+jitter)/H)-1;
+    float xs = (2*(x+0.5+cam_jitter[0])/W)-1;
+    float ys =((2*(H-y-1)+0.5+cam_jitter[1])/H)-1;
 
     float xc = xs*tan(fovW/2);
     float yc = ys*tan(fovH/2);

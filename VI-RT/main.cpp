@@ -50,11 +50,11 @@ int main(int argc, const char * argv[]) {
     
     
     // add an ambient light to the scene
-    AmbientLight ambient(RGB(0.04,0.04,0.04));
+    AmbientLight ambient(RGB(0.05,0.05,0.05));
     scene.lights.push_back(&ambient);
     scene.numLights++;
     
-    // Lets position this light in the ceiling where the light source is
+    // // Lets position this light in the ceiling where the light source is
     PointLight light1(RGB(0.65,0.65,0.65), Point(288, 508, 282), 100.0);
     scene.lights.push_back(&light1);
     scene.numLights++;
@@ -71,9 +71,22 @@ int main(int argc, const char * argv[]) {
     scene.lights.push_back(&light4);
     scene.numLights++;
 
-    PointLight light5(RGB(0.65,0.65,0.65), Point(328, 508, 322), 200.0);
-    scene.lights.push_back(&light5);
-    scene.numLights++;
+    // PointLight light5(RGB(0.65,0.65,0.65), Point(328, 508, 322), 200.0);
+    // scene.lights.push_back(&light5);
+    // scene.numLights++;
+
+    // Point v1 = {328, 508, 282};
+    // Point v2 = {328, 508, 24};
+    // Point v3 = {288, 508, 282};
+    
+    // Point v1v2 = (v2 - v1);
+    // Point v1v3 = (v3 - v1);
+    // Vector normal = {v1v2.X, v1v2.Y, v1v2.Z};
+    // normal = normal.cross(Vector(v1v3.X, v1v3.Y, v1v3.Z));
+
+    // AreaLight light6(RGB(0.65,0.65,0.65), v1,v2,v3, normal);
+    // scene.lights.push_back(&light6);
+    // scene.numLights++;
 
     scene.printSummary();
 
@@ -94,16 +107,18 @@ int main(int argc, const char * argv[]) {
     std::cout << "Result of AABB test: " << resultOfAABB << std::endl; // Print the result of the test
 
     // create the shader
-    RGB background(0.05, 0.05, 0.55);
+    RGB background(1, 0.05, 0.55);
 
     // shd = new AmbientShader(&scene, background);
     shd = new WhittedShader(&scene, background);
+    // shd = new DistributedShader(&scene, background);
 
     std::cout << "Shader created\n";
     // declare the renderer
-    int spp=4;     // samples per pixel
+    int spp=16;     // samples per pixel
+    int jitter=1;
 
-    StandardRenderer myRender (cam, &scene, img, shd, spp);
+    StandardRenderer myRender (cam, &scene, img, shd, spp, jitter);
     // render
     start = clock();
     std::cout << "Rendering\n";

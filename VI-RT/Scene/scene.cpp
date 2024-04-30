@@ -13,6 +13,7 @@
 #include "mesh.hpp"
 #include "Phong.hpp"
 #include "vector.hpp"
+#include "AreaLight.hpp"
 
 #include <iostream>
 #include <set>
@@ -227,6 +228,37 @@ bool Scene::trace (Ray r, Intersection *isect) {
             }
         }
     }
+
+    isect->isLight = false;
+
+
+    // Stochastic selection here, 
+    // Pseudo code, get the number of area lights in the scene
+    // select a random number between 0 and numAreaLights
+    // Get that light
+    // Verify the visibility of the light
+    //  probability of being selected = 1/Nlights
+    // color = color_l/p = color_l*Nlights
+    // for(auto l = lights.begin(); l != lights.end(); l++){
+    //     if ((*l)->type == AREA_LIGHT) {
+    //         AreaLight *al = (AreaLight *)*l;
+    //         if (al->gem->intersect(r, &curr_isect)) {
+    //             if (!intersection) { // first intersection
+    //                 intersection = true;
+    //             *isect = curr_isect;
+    //             isect->isLight = true;
+    //             isect->Le = al->L();
+    //         }
+    //         else if (curr_isect.depth < isect->depth) {
+    //             *isect = curr_isect;
+    //             isect->isLight = true;
+    //             isect->Le = al->L();
+    //         }
+    //         }
+    //     }
+
+
+    // }
 
     return intersection;
 }

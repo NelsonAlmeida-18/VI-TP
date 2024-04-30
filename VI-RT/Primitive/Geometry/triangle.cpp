@@ -15,7 +15,7 @@
 // Moller Trumbore intersection algorithm
 bool Triangle::intersect(Ray r, Intersection *isect) {
 
-    std::cout<< "Here in triangle intersect\n" << std::endl;
+    // std::cout<< "Here in triangle intersect\n" << std::endl;
     
     if (!bb.intersect(r)) {
         return false;
