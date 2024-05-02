@@ -89,6 +89,33 @@ int main(int argc, const char * argv[]) {
     scene.lights.push_back(&light6);
     scene.numLights++;
 
+    scene.lights.push_back(&light6);
+    scene.numLights++;
+
+    scene.lights.push_back(&light6);
+    scene.numLights++;
+
+    scene.lights.push_back(&light6);
+    scene.numLights++;
+
+    scene.lights.push_back(&light6);
+    scene.numLights++;
+
+    scene.lights.push_back(&light6);
+    scene.numLights++;
+
+    scene.lights.push_back(&light6);
+    scene.numLights++;
+
+    scene.lights.push_back(&light6);
+    scene.numLights++;
+
+    scene.lights.push_back(&light6);
+    scene.numLights++;
+
+    scene.lights.push_back(&light6);
+    scene.numLights++;
+
     scene.printSummary();
 
     // Image resolution
