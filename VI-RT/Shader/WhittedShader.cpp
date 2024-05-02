@@ -38,7 +38,7 @@ RGB WhittedShader::directLighting (Intersection isect, Phong *f) {
                 const float lightDist = lightDir.norm();
                 lightDir.normalize();
 
-                // Rever isto da shading normal
+            
                 float cosL = lightDir.dot(isect.sn);
 
                 if (cosL>0.){ // The light is not behind the primitive
@@ -85,9 +85,9 @@ RGB WhittedShader::shade(bool intersected, Intersection isect, int depth) {
         return (background);
     }
     
-    if (isect.isLight) { // intersection with a light source
-        return isect.Le;
-    }
+    // if (isect.isLight) { // intersection with a light source
+    //     return isect.Le;
+    // }
     
     // get the BRDF
     Phong *f = (Phong *)isect.f;

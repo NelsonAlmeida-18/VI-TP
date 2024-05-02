@@ -55,6 +55,7 @@
 
             return A;
         }
+        
         float points_area (Point v1, Point v2, Point v3) {
             
             // ...

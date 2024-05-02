@@ -47,7 +47,7 @@ void StandardRenderer::Render () {
                 // trace ray (scene)
                 intersected = scene->trace(primary, &isect);
 
-                if (!intersected) continue; // no intersection, continue with next ray
+                // if (!intersected) continue; // no intersection, continue with next ray
 
                 // Shade 
                 color+= shd->shade(intersected, isect, depth);

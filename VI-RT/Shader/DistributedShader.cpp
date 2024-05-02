@@ -86,15 +86,24 @@ RGB DistributedShader::directLighting (Intersection isect, Phong *f) {
                 float cosL = Ldir.dot(isect.sn);
                 // cosine between Ldir  and the area light source normal
                 float cosL_LA = Ldir.dot(al->gem->normal);
+                
                 // shade
                 if (cosL>0. and cosL_LA<=0.) { // light NOT behind primitive AND light normal points to the ray o
                     // generate the shadow ray
                     // TODO review this step
                     Ray shadow;
+                                       
+                    shadow.pix_x = isect.pix_x;
+                    shadow.pix_y = isect.pix_y;
+                    
+                    shadow.FaceID = isect.FaceID;
+                    
+                    // adjust origin by an EPSILON along the normal to avoid self occlusion at the origin
                     shadow.adjustOrigin(isect.gn);
-                    if (scene->visibility(shadow, Ldistance-EPSILON)) { // light source not occluded
-                        color += (Kd * L * cosL) / l_pdf;
-                    } 
+                    
+                    if (scene->visibility(shadow, Ldistance-EPSILON)) {  // if light source not occluded
+                        this_l_color += (Kd * L * cosL)/l_pdf;
+                    }
                 }
             }
             
@@ -209,9 +218,9 @@ RGB DistributedShader::shade(bool intersected, Intersection isect, int depth) {
     Phong *f = (Phong *)isect.f;
     
     // if there is a specular component sample it
-    if (!f->Ks.isZero() && depth <4) {
-        color += specularReflection (isect, f, depth+1);
-    }
+    // if (!f->Ks.isZero() && depth <4) {
+    //     color += specularReflection (isect, f, depth+1);
+    // }
     
     // if there is a diffuse component do direct light
     if (!f->Kd.isZero()) {
