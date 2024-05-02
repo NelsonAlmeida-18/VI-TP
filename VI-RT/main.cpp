@@ -75,18 +75,18 @@ int main(int argc, const char * argv[]) {
     // scene.lights.push_back(&light5);
     // scene.numLights++;
 
-    // Point v1 = {328, 508, 282};
-    // Point v2 = {328, 508, 24};
-    // Point v3 = {288, 508, 282};
+    Point v1 = {328, 508, 282};
+    Point v2 = {328, 508, 24};
+    Point v3 = {288, 508, 282};
     
-    // Point v1v2 = (v2 - v1);
-    // Point v1v3 = (v3 - v1);
-    // Vector normal = {v1v2.X, v1v2.Y, v1v2.Z};
-    // normal = normal.cross(Vector(v1v3.X, v1v3.Y, v1v3.Z));
+    Point v1v2 = (v2 - v1);
+    Point v1v3 = (v3 - v1);
+    Vector normal = {v1v2.X, v1v2.Y, v1v2.Z};
+    normal = normal.cross(Vector(v1v3.X, v1v3.Y, v1v3.Z));
 
-    // AreaLight light6(RGB(0.65,0.65,0.65), v1,v2,v3, normal);
-    // scene.lights.push_back(&light6);
-    // scene.numLights++;
+    AreaLight light6(RGB(0.65,0.65,0.65), v1,v2,v3, normal);
+    scene.lights.push_back(&light6);
+    scene.numLights++;
 
     scene.printSummary();
 
@@ -110,8 +110,8 @@ int main(int argc, const char * argv[]) {
     RGB background(1, 0.05, 0.55);
 
     // shd = new AmbientShader(&scene, background);
-    shd = new WhittedShader(&scene, background);
-    // shd = new DistributedShader(&scene, background);
+    // shd = new WhittedShader(&scene, background);
+    shd = new DistributedShader(&scene, background);
 
     std::cout << "Shader created\n";
     // declare the renderer

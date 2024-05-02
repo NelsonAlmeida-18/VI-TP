@@ -201,17 +201,17 @@ RGB DistributedShader::shade(bool intersected, Intersection isect, int depth) {
         return (background);
     }
     
-    // if (isect.isLight) { // intersection with a light source
-    //     return isect.Le;
-    // }
+    if (isect.isLight) { // intersection with a light source
+        return isect.Le;
+    }
     
     // get the BRDF
     Phong *f = (Phong *)isect.f;
     
     // if there is a specular component sample it
-    // if (!f->Ks.isZero() && depth <4) {
-    //     color += specularReflection (isect, f, depth+1);
-    // }
+    if (!f->Ks.isZero() && depth <4) {
+        color += specularReflection (isect, f, depth+1);
+    }
     
     // if there is a diffuse component do direct light
     if (!f->Kd.isZero()) {

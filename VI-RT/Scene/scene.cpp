@@ -239,6 +239,40 @@ bool Scene::trace (Ray r, Intersection *isect) {
     // Verify the visibility of the light
     //  probability of being selected = 1/Nlights
     // color = color_l/p = color_l*Nlights
+    
+    // Stochastic sampling
+    // Lets get a random number between 0 and numLights
+    int lightNdx = rand() % numLights;
+
+    // Get the light
+    Light *l = lights[lightNdx];
+
+    // Lets verify if the light is visible
+    if (l->type == AREA_LIGHT) {
+        AreaLight *al = (AreaLight *)l;
+        if (al->gem->intersect(r, &curr_isect)) {
+            if (!intersection) { // first intersection
+                intersection = true;
+                *isect = curr_isect;
+                isect->isLight = true;
+                isect->Le = al->L();
+            }
+            else if (curr_isect.depth < isect->depth) {
+                *isect = curr_isect;
+                isect->isLight = true;
+                isect->Le = al->L();
+            }
+        }
+    }
+
+    // The probability of it being selected = 1/Nlights
+    float probOfSelection = 1.0/numLights;
+
+    // The color of the light is color_l/p
+    isect->Le = isect->Le/probOfSelection;
+
+
+
     // for(auto l = lights.begin(); l != lights.end(); l++){
     //     if ((*l)->type == AREA_LIGHT) {
     //         AreaLight *al = (AreaLight *)*l;
@@ -256,8 +290,6 @@ bool Scene::trace (Ray r, Intersection *isect) {
     //         }
     //         }
     //     }
-
-
     // }
 
     return intersection;
