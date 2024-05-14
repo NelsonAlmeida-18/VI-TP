@@ -158,7 +158,7 @@ RGB PathTracerShader::specularReflection (Intersection isect, Phong *f, int dept
         
         Vector S_around_N;
         //  generate s_dir
-        // ...
+        
         
         Ray specular(isect.p, s_dir);
         
@@ -179,7 +179,7 @@ RGB PathTracerShader::specularReflection (Intersection isect, Phong *f, int dept
         RGB Rcolor = shade (intersected, s_isect, depth+1);
         
         // evaluate this ray contribution, i.e., color
-        // ...
+        color = (f->Ks  * Rcolor)  ;
 
         return color;
 
@@ -234,6 +234,7 @@ RGB PathTracerShader::diffuseReflection (Intersection isect, Phong *f, int depth
     Vector Rx, Ry;
     isect.gn.CoordinateSystem(&Rx, &Ry);
         
+    
     dir = D_around_Z.Rotate  (Rx, Ry, isect.gn);
         
     Ray diffuse(isect.p, dir);

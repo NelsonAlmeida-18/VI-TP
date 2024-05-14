@@ -55,9 +55,9 @@ int main(int argc, const char * argv[]) {
     scene.numLights++;
     
     // Lets position this light in the ceiling where the light source is
-    PointLight light1(RGB(0.65,0.65,0.65), Point(288, 508, 282), 100.0);
-    scene.lights.push_back(&light1);
-    scene.numLights++;
+    // PointLight light1(RGB(0.65,0.65,0.65), Point(288, 508, 282), 100.0);
+    // scene.lights.push_back(&light1);
+    // scene.numLights++;
 
     // PointLight light2(RGB(0.65,0.65,0.65), Point(248, 508, 242), 200.0);
     // scene.lights.push_back(&light2);
@@ -75,17 +75,21 @@ int main(int argc, const char * argv[]) {
     // scene.lights.push_back(&light5);
     // scene.numLights++;
 
+    // v 556.0 548.8 0.0
+    // v 556.0 548.8 559.2
+    // v 0.0 548.8 559.2
+    // v 0.0 548.8 0.0
     
-    Point v1 = {273.0, 273.0, 273.5};
-    Point v2 = {495.0, 495.0, 495.};
-    Point v3 = {279.0, 279.0, 279.5};
+    Point v1 = {238.0, 500,238.0 };
+    Point v2 = {328.0, 500,238.0};
+    Point v3 = {328, 500, 328.0};
 
-    Point v1v2 = (v1 - v2);
-    Point v1v3 = (v1 - v3);
+    Point v1v2 = (v2 - v1);
+    Point v1v3 = (v3 - v1);
     Vector normal = {v1v2.X, v1v2.Y, v1v2.Z};
     normal = normal.cross(Vector(v1v3.X, v1v3.Y, v1v3.Z));
 
-    AreaLight light6(RGB(0.65,0.65,0.65), v1,v2,v3, -1.f*normal);
+    AreaLight light6(RGB(0.65,0.65,0.65), v1,v2,v3, normal);
     scene.lights.push_back(&light6);
     scene.numLights++;
 

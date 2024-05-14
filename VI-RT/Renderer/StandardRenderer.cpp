@@ -9,6 +9,13 @@
 #include <iostream>
 #include <stdio.h>
 
+// For progress bars only
+
+// #include <thread>
+// #include <chrono>
+// #include <indicators/cursor_control.hpp>
+// #include <indicators/progress_bar.hpp>
+
 using namespace std;
 
 void StandardRenderer::Render () {

@@ -18,6 +18,30 @@ RGB DistributedShader::directLighting (Intersection isect, Phong *f) {
     RGB color(0.,0.,0.);
     Light *l;
 
+
+    // Stochastic selection here, 
+    // Pseudo code, get the number of area lights in the scene
+    // select a random number between 0 and numAreaLights
+    // Get that light
+    // Verify the visibility of the light
+    //  probability of being selected = 1/Nlights
+    // color = color_l/p = color_l*Nlights
+    
+    
+    // // Stochastic sampling
+    // // Lets get a random number between 0 and numLights
+    // int lightNdx = rand() % scene->numLights;
+
+    // // Get the light
+    // Light *l_iter = scene->lights[lightNdx];
+
+
+    // // The probability of it being selected = 1/Nlights
+    // float probOfSelection = 1.0/scene->numLights;
+
+    // // The color of the light is color_l/p
+    // isect.Le = isect.Le/probOfSelection;
+
     for (auto l_iter=scene->lights.begin() ; l_iter != scene->lights.end() ; l_iter++) {
         RGB this_l_color (0.,0.,0.);
         l = (Light *) (*l_iter);
@@ -90,8 +114,8 @@ RGB DistributedShader::directLighting (Intersection isect, Phong *f) {
                 // shade
                 if (cosL>0. and cosL_LA<=0.) { // light NOT behind primitive AND light normal points to the ray o
                     // generate the shadow ray
-                    // TODO review this step
-                    Ray shadow;
+            
+                    Ray shadow(isect.p, Ldir);
                                        
                     shadow.pix_x = isect.pix_x;
                     shadow.pix_y = isect.pix_y;
@@ -102,9 +126,10 @@ RGB DistributedShader::directLighting (Intersection isect, Phong *f) {
                     shadow.adjustOrigin(isect.gn);
                     
                     if (scene->visibility(shadow, Ldistance-EPSILON)) {  // if light source not occluded
-                        this_l_color += (Kd * L * cosL)/l_pdf;
+                        color+= (Kd * L * cosL)/l_pdf;
                     }
                 }
+    
             }
             
         }  // end area light
@@ -218,9 +243,10 @@ RGB DistributedShader::shade(bool intersected, Intersection isect, int depth) {
     Phong *f = (Phong *)isect.f;
     
     // if there is a specular component sample it
-    // if (!f->Ks.isZero() && depth <4) {
-    //     color += specularReflection (isect, f, depth+1);
-    // }
+    if (!f->Ks.isZero() && depth <4) {
+        
+        color += specularReflection (isect, f, depth+1);
+    }
     
     // if there is a diffuse component do direct light
     if (!f->Kd.isZero()) {
