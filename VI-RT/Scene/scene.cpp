@@ -13,6 +13,7 @@
 #include "mesh.hpp"
 #include "Phong.hpp"
 #include "vector.hpp"
+#include "AreaLight.hpp"
 
 #include <iostream>
 #include <set>
@@ -133,8 +134,6 @@ bool Scene::LoadObj(const std::string& fname) {
         mesh->bb.min.set(attrib.vertices[V1st], attrib.vertices[V1st+1], attrib.vertices[V1st+2]);
         mesh->bb.max.set(attrib.vertices[V1st], attrib.vertices[V1st+1], attrib.vertices[V1st+2]);
 
-
-
         // Lets loop over all the faces and vertices
         std::unordered_map<int, Point> vertices_rehash;
         int indexOffset=0;
@@ -142,7 +141,6 @@ bool Scene::LoadObj(const std::string& fname) {
             size_t numVerticesPerFace = size_t(shape.mesh.num_face_vertices[faceNum]);
             
             Face *f = new Face();
-            Phong *newMat = new Phong(*phong);
 
             Point myVtcs[3];
 
@@ -227,6 +225,29 @@ bool Scene::trace (Ray r, Intersection *isect) {
                 intersection = true;
                 *isect = curr_isect;
                 isect->f = BRDFs[(*prim_itr)->material_ndx];
+            }
+        }
+    }
+
+    isect->isLight = false;
+
+
+
+    for(auto l = lights.begin(); l != lights.end(); l++){
+        if ((*l)->type == AREA_LIGHT) {
+            AreaLight *al = (AreaLight *)*l;
+            if (al->gem->intersect(r, &curr_isect)) {
+                if (!intersection) { // first intersection
+                    intersection = true;
+                *isect = curr_isect;
+                isect->isLight = true;
+                isect->Le = al->L();
+            }
+            else if (curr_isect.depth < isect->depth) {
+                *isect = curr_isect;
+                isect->isLight = true;
+                isect->Le = al->L();
+            }
             }
         }
     }

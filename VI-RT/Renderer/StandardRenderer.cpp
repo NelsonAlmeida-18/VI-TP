@@ -9,40 +9,69 @@
 #include <iostream>
 #include <stdio.h>
 
+
+
+// // For progress bars only
+// #include <thread>
+// #include <chrono>
+
+
+
 using namespace std;
 
 void StandardRenderer::Render () {
     int W=512,H=512;  // resolution
     int x,y;
 
+    int ss;
     // get resolution from the camera
     cam->getResolution(&W, &H);
-    
-    // main rendering loop: get primary rays from the camera until done
-    for (y=0 ; y< H ; y++) {  // loop over rows
-        for (x=0 ; x< W ; x++) { // loop over columns
-            // For debugging lets project only one ray into a direction we know has a hit
+    std::cout << "Samples per pixel: " << spp << "\n";
 
-            Ray primary;
-            Intersection isect;
-            bool intersected;
-            RGB color;
-            int depth = 0;
-          
-            // Generate Ray (camera)
-            cam->GenerateRay(x,y,&primary);
-            
-            // trace ray (scene)
-            intersected = scene->trace(primary, &isect);
+    // Lets get the number of threads
+    // int numThreads = omp_get_max_threads(); 
+    // #pragma omp parallel private(y,x){
+        // #pragma omp for
+        // main rendering loop: get primary rays from the camera until done
+        for (y=0 ; y< H ; y++) {  // loop over rows
+            for (x=0 ; x< W ; x++) { // loop over columns
+                // For debugging lets project only one ray into a direction we know has a hit
+                Ray primary;
+                Intersection isect;
+                bool intersected;    
+                RGB color;
+                for (ss=0; ss<spp; ss++){
 
-            if (!intersected) continue; // no intersection, continue with next ray
+                    int depth = 0;
+                    
+                    // Lets add the x and y component of the jitter
+                    float jitterComponents[2];
+                    // Generate Ray (camera)
+                    // Jitter is a random number between -0.1 and 0.1
+                    float jitterx = ((float)rand()) / ((float)RAND_MAX);
+                    float jittery = ((float)rand()) / ((float)RAND_MAX);
+                    
+                    jitterComponents[0] = jitterx*jitter;
+                    jitterComponents[1] = jittery*jitter;
 
-            // Shade 
-            color = shd->shade(intersected, isect, depth);
-            
-            // write the result into the image frame buffer (image)
-            img->set(x,y,color);
-            
-        } // loop over columns
-    }   // loop over rows
+                    // std::cout << "Jitter " << jitter << "\n";
+                    cam->GenerateRay(x,y,&primary, jitterComponents);
+                    
+                    // trace ray (scene)
+                    intersected = scene->trace(primary, &isect);
+
+                    // if (!intersected) continue; // no intersection, continue with next ray
+
+                    // Shade 
+                    color+= shd->shade(intersected, isect, depth);
+                }
+
+                color = color/spp;
+                
+                // write the result into the image frame buffer (image)
+                img->set(x,y,color);
+                
+            } // loop over columns
+        }   // loop over rows
+    // }
 }

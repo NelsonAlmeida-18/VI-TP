@@ -18,6 +18,7 @@ using namespace std;
 // https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
 // Moller Trumbore intersection algorithm
 
+
 bool Mesh::TriangleIntersect (Ray r, Face f, Intersection *isect) {
 
     constexpr float epsilon = std::numeric_limits<float>::epsilon();
@@ -62,7 +63,15 @@ bool Mesh::TriangleIntersect (Ray r, Face f, Intersection *isect) {
     if (t>epsilon) {
         isect->depth = t;
         isect->p = r.o + t*r.dir;
-        isect->gn = e1.cross(e2);
+
+        // compute the normal
+        Vector normal = f.geoNormal;
+        Vector wo = -1.0 * r.dir;
+        normal.Faceforward(wo);
+
+        isect->gn = normal;
+        isect->sn = normal; 
+
         isect->wo = -1.0 * r.dir;
         isect->FaceID = f.FaceID;
         return true;

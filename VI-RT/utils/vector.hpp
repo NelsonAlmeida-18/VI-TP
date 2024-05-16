@@ -94,6 +94,11 @@ public:
         vec.Z = X * Rx.Z + Y * Ry.Z + Z * Rz.Z;
         return vec;
     }
+
+    Vector Faceforward(const Vector &v) {
+        Vector vv = *this;
+        return (vv.dot(v) < 0) ? -1.f * vv : vv;
+    }
 };
 
 class Point {

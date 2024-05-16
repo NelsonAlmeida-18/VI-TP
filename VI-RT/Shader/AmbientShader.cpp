@@ -40,6 +40,8 @@ RGB AmbientShader::shade(bool intersected, Intersection isect, int depth) {
             color += Ka * (*light_itr)->L();
             continue;
         }
+
+        
         else if((*light_itr)->type == POINT_LIGHT){
             // https://learnopengl.com/Lighting/Multiple-lights
 
@@ -71,10 +73,27 @@ RGB AmbientShader::shade(bool intersected, Intersection isect, int depth) {
                 // If the shadow ray intersects an object, the point is in shadow
                 // We will use linear attenuation therefore the intensity of the light will decrease with the distance
                 float attenuation = 1/(lightDist);
+                // Atenuação é baseada no meio e não uma constante/linear
+                // Definir meios participativos
+                float intensityMultiplier = light->intensity * attenuation;
 
-                RGB colorInSpot = light->color * f->Kd;
-                float intensityMultiplier = light->intensity* attenuation ;
+                // Diffuse component
+                RGB diffuseComponent = light->color * f->Kd;
 
+                
+                // Lets calculate the specular component
+                Vector R = 2 * (lightDir.dot(geoNormal)) * geoNormal - lightDir;
+                R.normalize();
+
+                Vector V =  -1.0 * isect.wo;
+                V.normalize();
+
+                // Alter the specular factor
+                float specularFactor = R.dot(V) > f->Ks.R ? R.dot(V) : f->Ks.R;
+                // specularFactor = specularFactor > 0 ? specularFactor : 0;
+                RGB specularComponent = f->Ks * light->color * pow(specularFactor, f->Ns);
+
+                RGB colorInSpot = diffuseComponent  + specularComponent;
                 color+=colorInSpot * intensityMultiplier;
             }
         
