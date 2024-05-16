@@ -5,6 +5,9 @@
 //  Created by Luis Paulo Santos on 30/01/2023.
 //
 
+//TODO: IDEAS: // Calculate the eta by running one test of the setup with one spp and then calculating the time it took to render and multiply by the spp
+
+
 #include <iostream>
 #include "scene.hpp"
 #include "perspective.hpp"
@@ -21,6 +24,40 @@
 #include "PointLightShader.hpp"
 
 #include <time.h>
+
+std::vector<AreaLight> GenerateAreaLights(Vector center,  RGB color, int width=40){
+
+    // Point v1 = {238.0, 500,238.0 };
+    // Point v2 = {328.0, 500,238.0};
+    // Point v3 = {328.0, 500, 328.0};
+    // Point v4 = {238.0, 500, 328.0};
+
+    // Point v1v2 = (v2 - v1);
+    // Point v1v3 = (v3 - v1);
+    // Vector normal = {v1v2.X, v1v2.Y, v1v2.Z};
+    // normal = normal.cross(Vector(v1v3.X, v1v3.Y, v1v3.Z));
+
+
+    std::vector<AreaLight> lights;
+
+    Point v1 = {center.X - width/2, center.Y, center.Z - width/2};
+    Point v2 = {center.X + width/2, center.Y, center.Z - width/2};
+    Point v3 = {center.X + width/2, center.Y, center.Z + width/2};
+    Point v4 = {center.X - width/2, center.Y, center.Z + width/2};
+
+    Point v1v2 = (v2 - v1);
+    Point v1v3 = (v3 - v1);
+    Vector normal = {v1v2.X, v1v2.Y, v1v2.Z};
+    normal = normal.cross(Vector(v1v3.X, v1v3.Y, v1v3.Z));
+
+    AreaLight light(RGB(0.65,0.65,0.65), v1,v2,v3, normal);
+    AreaLight light2(RGB(0.65,0.65,0.65), v4,v3,v1, normal);
+    
+    lights.push_back(light);
+    lights.push_back(light2);
+    
+    return lights;
+}
 
 int main(int argc, const char * argv[]) {
     Scene scene;
@@ -54,7 +91,7 @@ int main(int argc, const char * argv[]) {
     scene.lights.push_back(&ambient);
     scene.numLights++;
     
-    // Lets position this light in the ceiling where the light source is
+    // // // Lets position this light in the ceiling where the light source is
     // PointLight light1(RGB(0.65,0.65,0.65), Point(288, 508, 282), 100.0);
     // scene.lights.push_back(&light1);
     // scene.numLights++;
@@ -82,7 +119,8 @@ int main(int argc, const char * argv[]) {
     
     Point v1 = {238.0, 500,238.0 };
     Point v2 = {328.0, 500,238.0};
-    Point v3 = {328, 500, 328.0};
+    Point v3 = {328.0, 500, 328.0};
+    Point v4 = {238.0, 500, 328.0};
 
     Point v1v2 = (v2 - v1);
     Point v1v3 = (v3 - v1);
@@ -93,32 +131,47 @@ int main(int argc, const char * argv[]) {
     scene.lights.push_back(&light6);
     scene.numLights++;
 
-    scene.lights.push_back(&light6);
+    AreaLight light7(RGB(0.65,0.65,0.65), v4,v3,v1, normal);
+    scene.lights.push_back(&light7);
     scene.numLights++;
 
-    scene.lights.push_back(&light6);
+    // std::cout <<"Here\n";
+    // std::vector<AreaLight> light1 = GenerateAreaLights(Vector(278, 548.8, 278), RGB(0.65,0.65,0.65), 80);
+    // scene.lights.push_back(&light1[0]);
+    // scene.lights.push_back(&light1[1]);
+    // scene.numLights+=2;
+
+
+    Point v5 = {138.0, 500,138.0 };
+    Point v6 = {218.0, 500,138.0};
+    Point v7 = {218.0, 500, 218.0};
+    Point v8 = {138.0, 500, 218.0};
+
+    Point v5v6 = (v6 - v5);
+    Point v5v7 = (v7 - v5);
+    Vector normal2 = {v5v6.X, v5v6.Y, v5v6.Z};
+    normal2 = normal2.cross(Vector(v5v6.X, v5v6.Y, v5v6.Z));
+
+    AreaLight light8(RGB(1,1,1), v5,v6,v7, normal2);
+    scene.lights.push_back(&light8);
     scene.numLights++;
 
-    scene.lights.push_back(&light6);
-    scene.numLights++;
+    // AreaLight light9(RGB(0.65,0.65,0.65), v7,v6,v5, normal2);
+    // scene.lights.push_back(&light9);
+    // scene.numLights++;
 
-    scene.lights.push_back(&light6);
-    scene.numLights++;
+    // scene.lights.push_back(&light9);
+    // scene.numLights++;
+    // scene.lights.push_back(&light9);
+    // scene.numLights++;
+    // scene.lights.push_back(&light9);
+    // scene.numLights++;
+    // scene.lights.push_back(&light9);
+    // scene.numLights++;
+    // scene.lights.push_back(&light9);
+    // scene.numLights++;
 
-    scene.lights.push_back(&light6);
-    scene.numLights++;
-
-    scene.lights.push_back(&light6);
-    scene.numLights++;
-
-    scene.lights.push_back(&light6);
-    scene.numLights++;
-
-    scene.lights.push_back(&light6);
-    scene.numLights++;
-
-    scene.lights.push_back(&light6);
-    scene.numLights++;
+    
 
     scene.printSummary();
 
@@ -147,14 +200,16 @@ int main(int argc, const char * argv[]) {
     // shd = new WhittedShader(&scene, background); 
     
     // Area lights
-    shd = new DistributedShader(&scene, background);
+    // shd = new DistributedShader(&scene, background);
 
     // Path tracer
-    // shd = new PathTracerShader(&scene, background);
+    shd = new PathTracerShader(&scene, background);
 
     std::cout << "Shader created\n";
+    
     // declare the renderer
     int spp=16;     // samples per pixel
+    
     int jitter=1;
 
     StandardRenderer myRender (cam, &scene, img, shd, spp, jitter);

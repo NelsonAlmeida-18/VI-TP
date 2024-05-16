@@ -30,21 +30,21 @@ RGB DistributedShader::directLighting (Intersection isect, Phong *f) {
     
     // // Stochastic sampling
     // // Lets get a random number between 0 and numLights
-    // int lightNdx = rand() % scene->numLights;
+    int lightNdx = rand() % scene->numLights;
 
     // // Get the light
-    // Light *l_iter = scene->lights[lightNdx];
+    Light *l_iter = scene->lights[lightNdx];
 
 
     // // The probability of it being selected = 1/Nlights
-    // float probOfSelection = 1.0/scene->numLights;
+    float probOfSelection = 1.0/scene->numLights;
 
     // // The color of the light is color_l/p
-    // isect.Le = isect.Le/probOfSelection;
+    isect.Le = isect.Le/probOfSelection;
 
-    for (auto l_iter=scene->lights.begin() ; l_iter != scene->lights.end() ; l_iter++) {
+    // for (auto l_iter=scene->lights.begin() ; l_iter != scene->lights.end() ; l_iter++) {
         RGB this_l_color (0.,0.,0.);
-        l = (Light *) (*l_iter);
+        l = (Light *) (l_iter);
                 
         if (l->type == AMBIENT_LIGHT) {  // is it an ambient light ?
             if (!f->Ka.isZero()) {
@@ -136,8 +136,8 @@ RGB DistributedShader::directLighting (Intersection isect, Phong *f) {
         
         color += this_l_color;
 
-    } // for loop
-    return color;
+    // } // for loop
+    return color/probOfSelection;
 }
 
 RGB DistributedShader::specularReflection (Intersection isect, Phong *f, int depth) {
