@@ -37,7 +37,7 @@ int main(int argc, const char * argv[]) {
         success = scene.Load(argv[1]);
     } else {
         // load the default scene
-        success = scene.Load("/Users/rkeat/Desktop/Universidade/1anoMestrado/2semestre/VI-TP/VI-RT/utils/cornell_box_vi.obj");
+        success = scene.Load("./VI-RT/utils/cornell_box_vi.obj");
     }
 
     if (!success) {
@@ -157,10 +157,10 @@ int main(int argc, const char * argv[]) {
     // render
     start = clock();
     std::cout << "Rendering\n";
-    myRender.Render();
+    int numThreads = myRender.Render();
     std::cout << "Rendered\n";
     end = clock();
-    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    cpu_time_used = ((double) (end - start)) / (CLOCKS_PER_SEC * numThreads);
 
     // save the image
     img->Save("./MyImage.ppm");

@@ -19,7 +19,7 @@ public:
         spp = _spp;
         jitter = _jitter;
     }
-    void Render ();
+    int Render ();
 };
 
 #endif /* StandardRenderer_hpp */
