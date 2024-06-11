@@ -13,7 +13,7 @@
 using namespace std;
 
 int StandardRenderer::Render () {
-    int openmp = 0;
+    int openmp = 1;
     int W=512,H=512;  // resolution
     int x,y;
 

@@ -1,6 +1,6 @@
 CXX      := g++ 
-CXXFLAGS := -std=c++11 -O3 -fopenmp
-LDFLAGS  := 
+CXXFLAGS := -std=c++11 -O3 -fopenmp 
+LDFLAGS  := -ljpeg
 BUILD    := ./build
 OBJ_DIR  := $(BUILD)/objects
 APP_DIR  := $(BUILD)/apps
@@ -9,7 +9,7 @@ ARGS    :=
 
 TARGET   := VI-RT
 
-INCLUDE  := -IVI-RT/Camera/ -IVI-RT/Image -IVI-RT/Light -IVI-RT/Primitive -IVI-RT/Primitive/BRDF -IVI-RT/Primitive/Geometry -IVI-RT/Rays -IVI-RT/Renderer -IVI-RT/Scene -IVI-RT/Shader -IVI-RT/utils -IVI-RT/Scene/tinyobjloader/
+INCLUDE  := -IVI-RT/Camera/ -IVI-RT/Image -IVI-RT/Light -IVI-RT/Primitive -IVI-RT/Primitive/BRDF -IVI-RT/Primitive/Geometry -IVI-RT/Rays -IVI-RT/Renderer -IVI-RT/Scene -IVI-RT/Shader -IVI-RT/utils -IVI-RT/Image/mozjpeg/ -IVI-RT/Scene/tinyobjloader/
 
 SRC      :=                      \
    $(wildcard VI-RT/*.cpp) \

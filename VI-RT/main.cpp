@@ -17,19 +17,29 @@
 #include "AmbientLight.hpp"
 #include "PointLight.hpp"
 #include "AreaLight.hpp"
+#include "ImageEXR.hpp"
+#include "ImageJPG.hpp"
 
 #include "PointLightShader.hpp"
 
 #include <time.h>
 
+
+
 int main(int argc, const char * argv[]) {
     Scene scene;
     Perspective *cam; // Camera
-    ImagePPM *img;    // Image
+    ImageJPG *img;    // Image
     Shader *shd;
     bool success;
     clock_t start, end;
     double cpu_time_used;
+
+    // img = new ImageJPG(640,640);
+    // img->createTestImage();
+    // img->Save("./TestImage.jpg");
+
+
     
     
     if (argc>1) {
@@ -122,7 +132,9 @@ int main(int argc, const char * argv[]) {
     const int W= 640;
     const int H= 640;
     
-    img = new ImagePPM(W,H);
+    //img = new ImagePPM(W,H);
+    //img = new ImageEXR(W,H);
+    img = new ImageJPG(W,H);
 
     // Camera parameters
     const Point Eye ={280.0, 375.0, -830.0}, At={280.0, 265.0, 280.0};
@@ -143,10 +155,10 @@ int main(int argc, const char * argv[]) {
     // shd = new WhittedShader(&scene, background); 
     
     // Area lights
-    shd = new DistributedShader(&scene, background);
+    //shd = new DistributedShader(&scene, background);
 
     // Path tracer
-    // shd = new PathTracerShader(&scene, background);
+     shd = new PathTracerShader(&scene, background);
 
     std::cout << "Shader created\n";
     // declare the renderer
@@ -163,7 +175,7 @@ int main(int argc, const char * argv[]) {
     cpu_time_used = ((double) (end - start)) / (CLOCKS_PER_SEC * numThreads);
 
     // save the image
-    img->Save("./MyImage.ppm");
+    img->Save("./MyImage.jpg");
 
     
     fprintf (stdout, "Rendering time = %.3lf secs\n\n", cpu_time_used);

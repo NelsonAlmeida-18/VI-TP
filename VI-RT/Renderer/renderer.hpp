@@ -22,7 +22,7 @@ protected:
     
 public:
     Renderer (Camera *cam, Scene * scene, Image * img, Shader *shd): cam(cam), scene(scene), img(img), shd(shd) {}
-    virtual int Render () {}
+    virtual int Render () {return 1;}
 };
 
 #endif /* renderer_hpp */
