@@ -1,15 +1,100 @@
-//
-//  ImagePPM.cpp
-//  VI-RT
-//
-//  Created by Luis Paulo Santos on 09/03/2023.
-//
-
 #include "ImageEXR.hpp"
 #include <iostream>
 #include <fstream>
 #include <algorithm>  
-//#include <ImfRgbaFile.h>
+
+#include "miniz.h"
+#define TINYEXR_IMPLEMENTATION
+#include "tinyexr.h"
+
+
+#include <vector>
+#include <stdlib.h>
+
+#include <cstdio>
+#include <cstdlib>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
+#include <string>
+
+using namespace std;
+
+int ImageEXR::rgba2exr(int W, int H, std::string outfilename, RGBA_pixel rgbaImage[])
+{
+
+  int width, height;
+  int n;
+
+
+  EXRHeader header;
+  InitEXRHeader(&header);
+
+  EXRImage image;
+  InitEXRImage(&image);
+
+  image.num_channels = 3;
+
+  std::vector<float> images[3];
+  images[0].resize(W * H);
+  images[1].resize(W * H);
+  images[2].resize(W * H);
+
+
+  for (int j = 0 ; j< H ; j++) {
+    for (int i = 0; i < W ; ++i) {
+        images[0][j*W+i]=imageToSave[j*W+i].val[0];
+        images[1][j*W+i]=imageToSave[j*W+i].val[1];
+        images[2][j*W+i]=imageToSave[j*W+i].val[2];
+    }
+  }
+
+  float* image_ptr[3];
+  image_ptr[0] = &(images[2].at(0)); // B
+  image_ptr[1] = &(images[1].at(0)); // G
+  image_ptr[2] = &(images[0].at(0)); // R
+
+  image.images = (unsigned char**)image_ptr;
+  image.width = W;
+  image.height = H;
+
+  header.num_channels = 3;
+  header.channels = (EXRChannelInfo *)malloc(sizeof(EXRChannelInfo) * header.num_channels); 
+  // Must be BGR(A) order, since most of EXR viewers expect this channel order.
+  strncpy(header.channels[0].name, "B", 255); header.channels[0].name[strlen("B")] = '\0';
+  strncpy(header.channels[1].name, "G", 255); header.channels[1].name[strlen("G")] = '\0';
+  strncpy(header.channels[2].name, "R", 255); header.channels[2].name[strlen("R")] = '\0';
+
+  header.pixel_types = (int *)malloc(sizeof(int) * header.num_channels); 
+  header.requested_pixel_types = (int *)malloc(sizeof(int) * header.num_channels);
+  for (int i = 0; i < header.num_channels; i++) {
+    header.pixel_types[i] = TINYEXR_PIXELTYPE_FLOAT; // pixel type of input image
+    header.requested_pixel_types[i] = TINYEXR_PIXELTYPE_HALF; // pixel type of output image to be stored in .EXR
+  }
+
+  const char* err;
+
+  if (outfilename.substr(outfilename.length() - 4).compare(".exr") != 0) {
+    outfilename += ".exr";
+  }
+
+  int ret = SaveEXRImageToFile(&image, &header, outfilename.c_str(), &err);
+  if (ret != TINYEXR_SUCCESS) {
+    fprintf(stderr, "Save EXR err: %s\n", err);
+    return ret;
+  }
+  printf("Saved exr file. [ %s ] \n", outfilename.c_str());
+
+
+  free(header.channels);
+  free(header.pixel_types);
+  free(header.requested_pixel_types);
+
+  return 0;
+}
+
+
 
 void ImageEXR::ToneMap () {
     imageToSave = new RGBA_pixel[W*H];
@@ -26,6 +111,8 @@ void ImageEXR::ToneMap () {
 
 }
 
+
+
 bool ImageEXR::Save (std::string filename) {
 
     // Lets check if the image is empty
@@ -41,38 +128,10 @@ bool ImageEXR::Save (std::string filename) {
 
     // Details and code on PPM files available at:
     // https://www.scratchapixel.com/lessons/digital-imaging/simple-image-manipulations/reading-writing-images.html
-    
-    std::ofstream ofs;
-    try{
-        ofs.open(filename, std::ios::out | std::ios::binary);
-        if (ofs.fail()) throw "Can't open file";
-        ofs << "P6\n" << W << " " << H << "\n255\n";
-        // Fill the image with sinthetic data
-        // float test[W][H][3];
-        // for (int j = 0 ; j< H ; j++) {
-        //     for (int i = 0; i < W ; ++i) {
-        //         test[i][j][0] = (float)i/W;
-        //         test[i][j][1] = (float)j/H;
-        //         test[i][j][2] = 0.2;
-        //     }
-        // }
-        // // Write the image to the file
-        for (int j = 0 ; j< H ; j++) {
-            for (int i = 0; i < W ; ++i) {
-                ofs << imageToSave[j*W+i].val[0];
-                ofs << imageToSave[j*W+i].val[1];
-                ofs << imageToSave[j*W+i].val[2];
-            }
-        }
-        
 
-        // ofs.write(reinterpret_cast<char*>(test), W*H*sizeof(PPM_pixel));
-        ofs.close();
-    }
-    catch (std::ofstream::failure e) {
-        std::cout << "Exception opening/reading file\n";
-        return false;
-    }
+    
+    rgba2exr(W, H, filename, imageToSave);
+
 
     return true;
 }

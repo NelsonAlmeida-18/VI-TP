@@ -17,10 +17,13 @@ class ImageEXR: public Image {
 
 
     RGBA_pixel *imageToSave;
+    int rgba2exr(int W, int H, std::string outfilename, RGBA_pixel rgbaImage[]);
     void ToneMap ();
 public:
     ImageEXR(const int W, const int H):Image(W, H) {}
     bool Save (std::string filename);
+    bool SaveEXR(const char* outfilename);
+    
 };
 
 #endif /* ImagePPM_hpp */

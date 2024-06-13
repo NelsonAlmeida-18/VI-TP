@@ -29,7 +29,7 @@
 int main(int argc, const char * argv[]) {
     Scene scene;
     Perspective *cam; // Camera
-    ImageJPG *img;    // Image
+    ImageEXR *img;    // Image
     Shader *shd;
     bool success;
     clock_t start, end;
@@ -133,8 +133,8 @@ int main(int argc, const char * argv[]) {
     const int H= 640;
     
     //img = new ImagePPM(W,H);
-    //img = new ImageEXR(W,H);
-    img = new ImageJPG(W,H);
+    // img = new ImageJPG(W,H);
+    img = new ImageEXR(W,H);
 
     // Camera parameters
     const Point Eye ={280.0, 375.0, -830.0}, At={280.0, 265.0, 280.0};
@@ -175,7 +175,7 @@ int main(int argc, const char * argv[]) {
     cpu_time_used = ((double) (end - start)) / (CLOCKS_PER_SEC * numThreads);
 
     // save the image
-    img->Save("./MyImage.jpg");
+    img->Save("./MyImage");
 
     
     fprintf (stdout, "Rendering time = %.3lf secs\n\n", cpu_time_used);

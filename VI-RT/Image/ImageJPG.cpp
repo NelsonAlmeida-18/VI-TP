@@ -196,6 +196,9 @@ void ImageJPG::save_jpeg(JPG_Pixel* image, std::string filename, int quality=98)
 
   // Open file for writing
     FILE *outfile;
+    if (filename.substr(filename.length() - 4).compare(".jpg") != 0) {
+        filename += ".jpg";
+    }
     if ((outfile = fopen((char*)filename.c_str(), "wb")) == NULL) {
     fprintf(stderr, "can't open %s\n", (char*)filename.c_str());
     exit(1);
@@ -228,7 +231,7 @@ void ImageJPG::save_jpeg(JPG_Pixel* image, std::string filename, int quality=98)
     // Convert RGB data to format expected by MozJPEG
     JSAMPROW row_ptr[H];
     for (int y = 0; y < H; y++) {
-    row_ptr[y] = (JSAMPROW) &image[y * W];
+        row_ptr[y] = (JSAMPROW) &image[y * W];
     }
 
     // Write image data to JPEG file

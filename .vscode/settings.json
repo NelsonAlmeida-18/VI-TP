@@ -78,7 +78,8 @@
         "cfenv": "cpp",
         "cinttypes": "cpp",
         "typeindex": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "rgba2exr": "cpp"
     },
     "cmake.configureOnOpen": true
 }
