@@ -24,20 +24,48 @@
 
 #include <time.h>
 
+void createAreaLight(Scene &scene, Point center, int width, RGB color) {
+    double halfWidth = width / 2.0;
+
+    Point p1 = Point(center.X - halfWidth, center.Y, center.Z - halfWidth);
+    Point p2 = Point(center.X + halfWidth, center.Y, center.Z - halfWidth);
+    Point p3 = Point(center.X + halfWidth, center.Y, center.Z + halfWidth);
+    Point p4 = Point(center.X - halfWidth, center.Y, center.Z + halfWidth);
+    Vector normal = Vector(0.0, -1.0, 0.0);
+
+    AreaLight* areaLight = new AreaLight(color, p1, p2, p3, normal);
+    scene.lights.push_back(areaLight);
+    scene.numLights++;
+
+    AreaLight* areaLight2 = new AreaLight(color, p1, p3, p4, normal);
+    scene.lights.push_back(areaLight2);
+    scene.numLights++;
+}
 
 
 int main(int argc, const char * argv[]) {
+
+    // Todo get options from the argv or a path to a json file with the complete configuration
+    // Todo Verify if openmp is enabled and use it to parallelize the rendering
+    // Todo parallelize the scene loading
+
+
     Scene scene;
     Perspective *cam; // Camera
-    ImageEXR *img;    // Image
     Shader *shd;
     bool success;
     clock_t start, end;
     double cpu_time_used;
 
-    // img = new ImageJPG(640,640);
-    // img->createTestImage();
-    // img->Save("./TestImage.jpg");
+
+    // Image resolution
+    const int W= 640;
+    const int H= 640;
+    
+
+    ImagePPM *img = new ImagePPM(W,H);
+    // ImageJPG *img = new ImageJPG(640,640);
+    // ImageEXR *img = new ImageEXR(640,640);
 
 
     
@@ -64,10 +92,10 @@ int main(int argc, const char * argv[]) {
     scene.lights.push_back(&ambient);
     scene.numLights++;
     
-    // Lets position this light in the ceiling where the light source is
-    PointLight light1(RGB(0.65,0.65,0.65), Point(288, 508, 282), 100.0);
-    scene.lights.push_back(&light1);
-    scene.numLights++;
+    // // Lets position this light in the ceiling where the light source is
+    // PointLight light1(RGB(0.65,0.65,0.65), Point(288, 508, 282), 100.0);
+    // scene.lights.push_back(&light1);
+    // scene.numLights++;
 
     // PointLight light2(RGB(0.65,0.65,0.65), Point(248, 508, 242), 200.0);
     // scene.lights.push_back(&light2);
@@ -86,55 +114,35 @@ int main(int argc, const char * argv[]) {
     // scene.numLights++;
 
     
-    Point v1 = {273.0, 273.0, 273.5};
-    Point v2 = {495.0, 495.0, 495.};
-    Point v3 = {279.0, 279.0, 279.5};
+    // Point center = Point(343.0,548.0,227.0);
+    // int width = 40;
+    // Point p1 = Point(center.X-width, center.Y, center.Z-width);
+    // Point p2 = Point(center.X + width, center.Y, center.Z - width);
+    // Point p3 = Point(center.X + width, center.Y, center.Z + width);
+    // Point p4 = Point(center.X - width, center.Y, center.Z + width);
+    // Vector normal = Vector(0.0, -1.0, 0.0);
 
-    Point v1v2 = (v1 - v2);
-    Point v1v3 = (v1 - v3);
-    Vector normal = {v1v2.X, v1v2.Y, v1v2.Z};
-    normal = normal.cross(Vector(v1v3.X, v1v3.Y, v1v3.Z));
+    // AreaLight areaLight(RGB(0.65,0.65,0.65), p1, p2, p3, normal);
+    // scene.lights.push_back(&areaLight);
+    // scene.numLights++;
 
-    AreaLight light6(RGB(0.65,0.65,0.65), v1,v2,v3, -1.f*normal);
-    scene.lights.push_back(&light6);
-    scene.numLights++;
+    // AreaLight areaLight2(RGB(0.65,0.65,0.65), p1, p3, p4, normal);
+    // scene.lights.push_back(&areaLight2);
+    // scene.numLights++;
 
-    scene.lights.push_back(&light6);
-    scene.numLights++;
+    // Central light
+    RGB areaLightColor(0.65, 0.65, 0.65);
+    int width = 90;
+    createAreaLight(scene, Point(278.0, 548.0, 279.5), width, areaLightColor);
 
-    scene.lights.push_back(&light6);
-    scene.numLights++;
+    double offset = 160.0;
+    createAreaLight(scene, Point(278.0 + offset, 548.0, 279.5+offset), width, areaLightColor);
+    createAreaLight(scene, Point(278.0 - offset, 548.0, 279.5-offset), width, areaLightColor);
+    createAreaLight(scene, Point(278.0-offset, 548.0, 279.5 + offset), width, areaLightColor);
+    createAreaLight(scene, Point(278.0+offset, 548.0, 279.5 - offset), width, areaLightColor);
 
-    scene.lights.push_back(&light6);
-    scene.numLights++;
-
-    scene.lights.push_back(&light6);
-    scene.numLights++;
-
-    scene.lights.push_back(&light6);
-    scene.numLights++;
-
-    scene.lights.push_back(&light6);
-    scene.numLights++;
-
-    scene.lights.push_back(&light6);
-    scene.numLights++;
-
-    scene.lights.push_back(&light6);
-    scene.numLights++;
-
-    scene.lights.push_back(&light6);
-    scene.numLights++;
 
     scene.printSummary();
-
-    // Image resolution
-    const int W= 640;
-    const int H= 640;
-    
-    //img = new ImagePPM(W,H);
-    // img = new ImageJPG(W,H);
-    img = new ImageEXR(W,H);
 
     // Camera parameters
     const Point Eye ={280.0, 375.0, -830.0}, At={280.0, 265.0, 280.0};
@@ -155,10 +163,10 @@ int main(int argc, const char * argv[]) {
     // shd = new WhittedShader(&scene, background); 
     
     // Area lights
-    //shd = new DistributedShader(&scene, background);
+    shd = new DistributedShader(&scene, background);
 
     // Path tracer
-     shd = new PathTracerShader(&scene, background);
+    //  shd = new PathTracerShader(&scene, background);
 
     std::cout << "Shader created\n";
     // declare the renderer
