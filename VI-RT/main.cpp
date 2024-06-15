@@ -63,9 +63,9 @@ int main(int argc, const char * argv[]) {
     const int H= 640;
     
 
-    ImagePPM *img = new ImagePPM(W,H);
+    // ImagePPM *img = new ImagePPM(W,H);
     // ImageJPG *img = new ImageJPG(640,640);
-    // ImageEXR *img = new ImageEXR(640,640);
+    ImageEXR *img = new ImageEXR(640,640);
 
 
     
