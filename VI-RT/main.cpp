@@ -24,6 +24,7 @@
 
 #include <time.h>
 
+
 void createAreaLight(Scene &scene, Point center, int width, RGB color) {
     double halfWidth = width / 2.0;
 
@@ -46,7 +47,6 @@ void createAreaLight(Scene &scene, Point center, int width, RGB color) {
 int main(int argc, const char * argv[]) {
 
     // Todo get options from the argv or a path to a json file with the complete configuration
-    // Todo Verify if openmp is enabled and use it to parallelize the rendering
     // Todo parallelize the scene loading
 
 
@@ -56,6 +56,13 @@ int main(int argc, const char * argv[]) {
     bool success;
     clock_t start, end;
     double cpu_time_used;
+    
+    int parallel = 1;
+    int interactiveOutut=1;
+    // declare the renderer
+    int spp=16;     // samples per pixel
+    int jitter=1;
+
 
 
     // Image resolution
@@ -64,10 +71,8 @@ int main(int argc, const char * argv[]) {
     
 
     // ImagePPM *img = new ImagePPM(W,H);
-    // ImageJPG *img = new ImageJPG(640,640);
-    ImageEXR *img = new ImageEXR(640,640);
-
-
+    // ImageJPG *img = new ImageJPG(W,H);
+    ImageEXR *img = new ImageEXR(W,H);
     
     
     if (argc>1) {
@@ -88,9 +93,9 @@ int main(int argc, const char * argv[]) {
     
     
     // add an ambient light to the scene
-    AmbientLight ambient(RGB(0.05,0.05,0.05));
-    scene.lights.push_back(&ambient);
-    scene.numLights++;
+    // AmbientLight ambient(RGB(0.05,0.05,0.05));
+    // scene.lights.push_back(&ambient);
+    // scene.numLights++;
     
     // // Lets position this light in the ceiling where the light source is
     // PointLight light1(RGB(0.65,0.65,0.65), Point(288, 508, 282), 100.0);
@@ -131,15 +136,16 @@ int main(int argc, const char * argv[]) {
     // scene.numLights++;
 
     // Central light
-    RGB areaLightColor(0.65, 0.65, 0.65);
+    RGB areaLightColor(0.25, 0.25, 0.25);
     int width = 90;
     createAreaLight(scene, Point(278.0, 548.0, 279.5), width, areaLightColor);
 
     double offset = 160.0;
-    createAreaLight(scene, Point(278.0 + offset, 548.0, 279.5+offset), width, areaLightColor);
-    createAreaLight(scene, Point(278.0 - offset, 548.0, 279.5-offset), width, areaLightColor);
-    createAreaLight(scene, Point(278.0-offset, 548.0, 279.5 + offset), width, areaLightColor);
-    createAreaLight(scene, Point(278.0+offset, 548.0, 279.5 - offset), width, areaLightColor);
+    areaLightColor = RGB(0.25, 0.25, 0.25);
+    // createAreaLight(scene, Point(278.0 + offset, 548.0, 279.5+offset), width, areaLightColor);
+    // createAreaLight(scene, Point(278.0 - offset, 548.0, 279.5-offset), width, areaLightColor);
+    // createAreaLight(scene, Point(278.0-offset, 548.0, 279.5 + offset), width, areaLightColor);
+    // createAreaLight(scene, Point(278.0+offset, 548.0, 279.5 - offset), width, areaLightColor);
 
 
     scene.printSummary();
@@ -150,10 +156,6 @@ int main(int argc, const char * argv[]) {
     const float fovW = 45.0, fovH = 45.0;
     cam = new Perspective(Eye, At, Up, W, H, fovW, fovH);
 
-    BB bb; // Create an instance of the BB c d dlass
-    bool resultOfAABB = bb.testAABBIntersect(); // Call the testAABBIntersect() function on the instance
-    std::cout << "Result of AABB test: " << resultOfAABB << std::endl; // Print the result of the test
-
     // create the shader
     RGB background(0, 0.5, 0.55);
 
@@ -163,17 +165,14 @@ int main(int argc, const char * argv[]) {
     // shd = new WhittedShader(&scene, background); 
     
     // Area lights
-    shd = new DistributedShader(&scene, background);
+    // shd = new DistributedShader(&scene, background);
 
     // Path tracer
-    //  shd = new PathTracerShader(&scene, background);
+    shd = new PathTracerShader(&scene, background);
 
     std::cout << "Shader created\n";
-    // declare the renderer
-    int spp=16;     // samples per pixel
-    int jitter=1;
 
-    StandardRenderer myRender (cam, &scene, img, shd, spp, jitter);
+    StandardRenderer myRender (cam, &scene, img, shd, spp, jitter, parallel, interactiveOutut);
     // render
     start = clock();
     std::cout << "Rendering\n";

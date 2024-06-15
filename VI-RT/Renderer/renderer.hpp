@@ -23,6 +23,7 @@ protected:
 public:
     Renderer (Camera *cam, Scene * scene, Image * img, Shader *shd): cam(cam), scene(scene), img(img), shd(shd) {}
     virtual int Render () {return 1;}
+    virtual void paralelRender(int numThreads, int W, int H, int spp, int jitter) {}
 };
 
 #endif /* renderer_hpp */

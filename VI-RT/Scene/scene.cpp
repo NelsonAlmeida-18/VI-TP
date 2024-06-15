@@ -20,6 +20,10 @@
 #include <stdio.h>
 #include <unordered_map>
 
+#ifndef _OPENMP
+    #include <omp.h>
+#endif
+
 using namespace tinyobj;
 
 static void PrintInfo (const ObjReader myObj) {
@@ -69,7 +73,6 @@ bool Scene::Load (const std::string &fname) {
     //Verify if the file passed is a .obj or a .mtl file
     if (fname.find(".obj") != std::string::npos) {
         // Load the .obj file
-
         return LoadObj(fname);
     }
     return false;
@@ -242,43 +245,17 @@ bool Scene::trace (Ray r, Intersection *isect) {
     
     // Stochastic sampling
     // Lets get a random number between 0 and numLights
-    int lightNdx = rand() % numLights;
+    // int lightNdx = rand() % numLights;
 
-    // Get the light
-    Light *l = lights[lightNdx];
+    // // Get the light
+    // Light *l = lights[lightNdx];
 
-    // Lets verify if the light is visible
-    if (l->type == AREA_LIGHT) {
-        AreaLight *al = (AreaLight *)l;
-        if (al->gem->intersect(r, &curr_isect)) {
-            if (!intersection) { // first intersection
-                intersection = true;
-                *isect = curr_isect;
-                isect->isLight = true;
-                isect->Le = al->L();
-            }
-            else if (curr_isect.depth < isect->depth) {
-                *isect = curr_isect;
-                isect->isLight = true;
-                isect->Le = al->L();
-            }
-        }
-    }
-
-    // The probability of it being selected = 1/Nlights
-    float probOfSelection = 1.0/numLights;
-
-    // The color of the light is color_l/p
-    isect->Le = isect->Le/probOfSelection;
-
-
-
-    // for(auto l = lights.begin(); l != lights.end(); l++){
-    //     if ((*l)->type == AREA_LIGHT) {
-    //         AreaLight *al = (AreaLight *)*l;
-    //         if (al->gem->intersect(r, &curr_isect)) {
-    //             if (!intersection) { // first intersection
-    //                 intersection = true;
+    // // Lets verify if the light is visible
+    // if (l->type == AREA_LIGHT) {
+    //     AreaLight *al = (AreaLight *)l;
+    //     if (al->gem->intersect(r, &curr_isect)) {
+    //         if (!intersection) { // first intersection
+    //             intersection = true;
     //             *isect = curr_isect;
     //             isect->isLight = true;
     //             isect->Le = al->L();
@@ -288,9 +265,35 @@ bool Scene::trace (Ray r, Intersection *isect) {
     //             isect->isLight = true;
     //             isect->Le = al->L();
     //         }
-    //         }
     //     }
     // }
+
+    // // The probability of it being selected = 1/Nlights
+    // float probOfSelection = 1.0/numLights;
+
+    // // The color of the light is color_l/p
+    // isect->Le = isect->Le/probOfSelection;
+
+
+
+    for(auto l = lights.begin(); l != lights.end(); l++){
+        if ((*l)->type == AREA_LIGHT) {
+            AreaLight *al = (AreaLight *)*l;
+            if (al->gem->intersect(r, &curr_isect)) {
+                if (!intersection) { // first intersection
+                    intersection = true;
+                *isect = curr_isect;
+                isect->isLight = true;
+                isect->Le = al->L();
+            }
+            else if (curr_isect.depth < isect->depth) {
+                *isect = curr_isect;
+                isect->isLight = true;
+                isect->Le = al->L();
+            }
+            }
+        }
+    }
 
     return intersection;
 }

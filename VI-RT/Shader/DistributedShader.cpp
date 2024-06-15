@@ -98,10 +98,10 @@ RGB DistributedShader::directLighting (Intersection isect, Phong *f) {
                     shadow.FaceID = isect.FaceID;
                     
                     // adjust origin by an EPSILON along the normal to avoid self occlusion at the origin
-                    shadow.adjustOrigin(isect.sn);
+                    shadow.adjustOrigin(isect.gn);
                     
                     if (scene->visibility(shadow, Ldistance-EPSILON)) {  // if light source not occluded
-                        this_l_color += Kd * L * cosL/ l_pdf;
+                        this_l_color += (Kd * L * cosL)/ l_pdf;
                     }
 
                 }
