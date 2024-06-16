@@ -1,6 +1,9 @@
+OPENCV_INCLUDE_PATH = /usr/include/opencv4
+OPENCV_LIB_PATH = /usr/lib
+
 CXX      := g++ 
-CXXFLAGS := -std=c++11 -O3 -fopenmp 
-LDFLAGS  := -ljpeg 
+CXXFLAGS := -std=c++11 -O3 -fopenmp  -I$(OPENCV_INCLUDE_PATH)
+LDFLAGS  := -ljpeg -lopencv_core -lopencv_imgcodecs -lopencv_highgui -lopencv_imgproc
 BUILD    := ./build
 OBJ_DIR  := $(BUILD)/objects
 APP_DIR  := $(BUILD)/apps
@@ -12,7 +15,7 @@ TARGET   := VI-RT
 TINYEXR_PATH := ./VI-RT/Image/tinyexr-1.0.8/tinyexr.cc
 MINIZ_O_PATH := ./VI-RT/Image/tinyexr-1.0.8/deps/miniz/miniz.o
 
-INCLUDE  := -IVI-RT/Camera/ -IVI-RT/Image -IVI-RT/Light -IVI-RT/Primitive -IVI-RT/Primitive/BRDF -IVI-RT/Primitive/Geometry -IVI-RT/Rays -IVI-RT/Renderer -IVI-RT/Scene -IVI-RT/Shader -IVI-RT/utils -IVI-RT/Image/mozjpeg/ -IVI-RT/Image/miniz/ -IVI-RT/Image/tinyexr-1.0.8/  -IVI-RT/Image/tinyexr-1.0.8/examples/common/  -IVI-RT/Scene/tinyobjloader/ -IVI-RT/utils/opencv-4.x/ 
+INCLUDE  := -IVI-RT/Camera/ -IVI-RT/Image -IVI-RT/Light -IVI-RT/Primitive -IVI-RT/Primitive/BRDF -IVI-RT/Primitive/Geometry -IVI-RT/Rays -IVI-RT/Renderer -IVI-RT/Scene -IVI-RT/Shader -IVI-RT/utils -IVI-RT/Image/mozjpeg/ -IVI-RT/Image/miniz/ -IVI-RT/Image/tinyexr-1.0.8/  -IVI-RT/Image/tinyexr-1.0.8/examples/common/  -IVI-RT/Scene/tinyobjloader/ -I/usr/include/opencv4/opencv -I/usr/include/opencv4
 
 SRC      :=                      \
    $(wildcard VI-RT/*.cpp) \

@@ -25,7 +25,6 @@ public:
     }
     int Render ();
     void paralelRender(int numThreads, int W, int H, int spp, int jitter);
-    
 };
 
 #endif /* StandardRenderer_hpp */
