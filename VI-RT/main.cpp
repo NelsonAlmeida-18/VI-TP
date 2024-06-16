@@ -57,7 +57,7 @@ int main(int argc, const char * argv[]) {
     clock_t start, end;
     double cpu_time_used;
     
-    int parallel = 0;
+    int parallel = 1;
     int interactiveOutut=1;
     // declare the renderer
     int spp=16;     // samples per pixel
@@ -165,10 +165,10 @@ int main(int argc, const char * argv[]) {
     // shd = new WhittedShader(&scene, background); 
     
     // Area lights
-    shd = new DistributedShader(&scene, background);
+    // shd = new DistributedShader(&scene, background);
 
     // Path tracer
-    // shd = new PathTracerShader(&scene, background);
+    shd = new PathTracerShader(&scene, background);
 
     std::cout << "Shader created\n";
 
