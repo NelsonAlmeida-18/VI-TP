@@ -9,7 +9,7 @@ Rendering time = 1158.051 secs
 ## Sequential Result
 
 #primitives = 8 ; #lights = 10 ; #materials = 8 ;
-Samples per pixel: 16
+Samples per pixel: 2048
 Number of threads: 1
 
-Rendering time = 63.479 secs
+Rendering time = 3751.744 secs

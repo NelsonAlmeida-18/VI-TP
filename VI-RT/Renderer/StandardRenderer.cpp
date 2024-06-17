@@ -62,6 +62,8 @@ int StandardRenderer::Render() {
                     // Shade
                     color += shd->shade(intersected, isect, depth);
 
+                    color = color/spp;
+
                     // write the result into the image frame buffer (image)
                     img->set(x, y, color);
 
@@ -89,6 +91,7 @@ int StandardRenderer::Render() {
 void StandardRenderer::paralelRender(int numThreads, int W, int H, int spp, int jitter) {
     int x, y, ss;
     cv::Mat image = cv::Mat::zeros(H, W, CV_8UC3);
+    RGB* colors = new RGB[W*H];
     #pragma omp parallel num_threads(numThreads) private(x, y, ss)
     {
         for (ss = 0; ss < spp; ss++) {
@@ -103,7 +106,7 @@ void StandardRenderer::paralelRender(int numThreads, int W, int H, int spp, int 
                     RGB color;
                     int depth = 0;
 
-                    // Let's add the x and y component of the jitter
+                    // Let's add tahe x and y component of the jitter
                     float jitterComponents[2];
                     // Generate Ray (camera)
                     // Jitter is a random number between -0.1 and 0.1
@@ -121,22 +124,31 @@ void StandardRenderer::paralelRender(int numThreads, int W, int H, int spp, int 
                     // Shade
                     color += shd->shade(intersected, isect, depth);
 
-                    // write the result into the image frame buffer (image)
-                    img->set(x, y, color);
+                    colors[y*W + x] += color/spp;
 
+                    if(ss == spp-1){
+                        img->set(x, y, colors[y*W + x]);
+
+                    }
+
+                    // write the result into the image frame buffer (image)
+                    // img->set(x, y, color);
+                    
                     // write the result into the OpenCV image
                     cv::Vec3b& cvColor = image.at<cv::Vec3b>(y, x);
-                    cvColor[0] = static_cast<uchar>(color.B * 255);
-                    cvColor[1] = static_cast<uchar>(color.G * 255);
-                    cvColor[2] = static_cast<uchar>(color.R * 255);
+                    cvColor[0] = static_cast<uchar>(colors[y*W+x].B * 255);
+                    cvColor[1] = static_cast<uchar>(colors[y*W+x].G * 255);
+                    cvColor[2] = static_cast<uchar>(colors[y*W+x].R * 255);
                 } // loop over columns
             }   // loop over rows
 
-            #pragma omp single
-            {
-                // Display the image in an OpenCV window after each sample run
-                cv::imshow("Rendered Image", image);
-                cv::waitKey(1); // Small delay to allow the window to refresh without blocking
+            if (interactiveOutput){
+                #pragma omp single
+                {
+                    // Display the image in an OpenCV window after each sample run
+                    cv::imshow("Rendered Image", image);
+                    cv::waitKey(1); // Small delay to allow the window to refresh without blocking
+                }   
             }
         }
     }
