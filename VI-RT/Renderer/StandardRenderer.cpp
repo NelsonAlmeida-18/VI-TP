@@ -126,6 +126,7 @@ void StandardRenderer::paralelRender(int numThreads, int W, int H, int spp, int 
 
                     colors[y*W + x] += color/spp;
 
+
                     if(ss == spp-1){
                         img->set(x, y, colors[y*W + x]);
 
@@ -136,9 +137,10 @@ void StandardRenderer::paralelRender(int numThreads, int W, int H, int spp, int 
                     
                     // write the result into the OpenCV image
                     cv::Vec3b& cvColor = image.at<cv::Vec3b>(y, x);
-                    cvColor[0] = static_cast<uchar>(colors[y*W+x].B * 255);
-                    cvColor[1] = static_cast<uchar>(colors[y*W+x].G * 255);
-                    cvColor[2] = static_cast<uchar>(colors[y*W+x].R * 255);
+                    // std::cout << "Color: " << std::min(1.f, colors[y*W+x].R*spp) * 255 << " " << std::min(1.f, colors[y*W+x].G*spp) * 255 << " " << std::min(1.f, colors[y*W+x].B*spp) * 255 << "\n";
+                    cvColor[0] = static_cast<uchar>(std::min(1.f, colors[y*W+x].B*spp) * 255);
+                    cvColor[1] = static_cast<uchar>(std::min(1.f, colors[y*W+x].G*spp) * 255);
+                    cvColor[2] = static_cast<uchar>(std::min(1.f, colors[y*W+x].R*spp) * 255);
                 } // loop over columns
             }   // loop over rows
 
