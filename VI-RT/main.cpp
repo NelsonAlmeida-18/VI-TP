@@ -73,8 +73,8 @@ int main(int argc, const char * argv[]) {
 
     // ImagePPM *img = new ImagePPM(W,H);
     // ImageJPG *img = new ImageJPG(W,H);
-    ImageEXR *img = new ImageEXR(W,H);
-    // ImagePFM *img = new ImagePFM(W,H);
+    // ImageEXR *img = new ImageEXR(W,H);
+    ImagePFM *img = new ImagePFM(W,H);
     
     
     if (argc>1) {
