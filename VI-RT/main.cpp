@@ -19,6 +19,7 @@
 #include "AreaLight.hpp"
 #include "ImageEXR.hpp"
 #include "ImageJPG.hpp"
+#include "ImagePFM.hpp"
 
 #include "PointLightShader.hpp"
 
@@ -73,6 +74,7 @@ int main(int argc, const char * argv[]) {
     ImagePPM *img = new ImagePPM(W,H);
     // ImageJPG *img = new ImageJPG(W,H);
     // ImageEXR *img = new ImageEXR(W,H);
+    // ImagePFM *img = new ImagePFM(W,H);
     
     
     if (argc>1) {
@@ -157,7 +159,7 @@ int main(int argc, const char * argv[]) {
     cam = new Perspective(Eye, At, Up, W, H, fovW, fovH);
 
     // create the shader
-    RGB background(0, 0.5, 0.55);
+    RGB background(0.00, 0.00, 0.55);
 
     // shd = new AmbientShader(&scene, background);
     
