@@ -59,7 +59,7 @@ int main(int argc, const char * argv[]) {
     double cpu_time_used;
     
     int parallel = 1;
-    int interactiveOutut=1;
+    int interactiveOutut=0;
     // declare the renderer
     int spp=2048;     // samples per pixel
     int jitter=1;
@@ -71,9 +71,9 @@ int main(int argc, const char * argv[]) {
     const int H= 640;
     
 
-    ImagePPM *img = new ImagePPM(W,H);
+    // ImagePPM *img = new ImagePPM(W,H);
     // ImageJPG *img = new ImageJPG(W,H);
-    // ImageEXR *img = new ImageEXR(W,H);
+    ImageEXR *img = new ImageEXR(W,H);
     // ImagePFM *img = new ImagePFM(W,H);
     
     

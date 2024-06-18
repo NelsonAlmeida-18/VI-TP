@@ -23,7 +23,7 @@ int ImageEXR::rgba2exr(int W, int H, std::string outfilename, RGBA_pixel rgbaIma
     EXRImage image;
     InitEXRImage(&image);
 
-    image.num_channels = 4; // Changed to 4 to include the alpha channel
+    image.num_channels = 4; // 4 channels: R, G, B, A
 
     std::vector<float> images[4];
     images[0].resize(W * H);
@@ -31,15 +31,20 @@ int ImageEXR::rgba2exr(int W, int H, std::string outfilename, RGBA_pixel rgbaIma
     images[2].resize(W * H);
     images[3].resize(W * H); // Alpha channel
 
+    // std::cout << "Here "<< W << " " << H << std::endl;
     for (int j = 0; j < H; j++) {
         for (int i = 0; i < W; ++i) {
-            images[0][j * W + i] = rgbaImage[j * W + i].val[0] / 255.0f;
-            images[1][j * W + i] = rgbaImage[j * W + i].val[1] / 255.0f;
-            images[2][j * W + i] = rgbaImage[j * W + i].val[2] / 255.0f;
-            images[3][j * W + i] = rgbaImage[j * W + i].val[3] / 255.0f;
+            // std::cout << i << " " << j << std::endl;
+            images[0][j * W + i] = imagePlane[j * W + i].R;
+            images[1][j * W + i] = imagePlane[j * W + i].G;
+            images[2][j * W + i] = imagePlane[j * W + i].B;
+            images[3][j * W + i] = 255;
+            // images[1][j * W + i] = rgbaImage[j * W + i].val[1];
+            // images[2][j * W + i] = rgbaImage[j * W + i].val[2];
+            // images[3][j * W + i] = 255;
         }
     }
-
+    // std::cout << "Here" << std::endl;
     float* image_ptr[4];
     image_ptr[0] = &(images[2].at(0)); // B
     image_ptr[1] = &(images[1].at(0)); // G
@@ -50,10 +55,10 @@ int ImageEXR::rgba2exr(int W, int H, std::string outfilename, RGBA_pixel rgbaIma
     image.width = W;
     image.height = H;
 
-    header.num_channels = 4; 
+    
+    header.num_channels = 4;
     header.channels = (EXRChannelInfo *)malloc(sizeof(EXRChannelInfo) * header.num_channels);
 
-    
     strncpy(header.channels[0].name, "B", 255); header.channels[0].name[strlen("B")] = '\0';
     strncpy(header.channels[1].name, "G", 255); header.channels[1].name[strlen("G")] = '\0';
     strncpy(header.channels[2].name, "R", 255); header.channels[2].name[strlen("R")] = '\0';
@@ -63,7 +68,7 @@ int ImageEXR::rgba2exr(int W, int H, std::string outfilename, RGBA_pixel rgbaIma
     header.requested_pixel_types = (int *)malloc(sizeof(int) * header.num_channels);
     for (int i = 0; i < header.num_channels; i++) {
         header.pixel_types[i] = TINYEXR_PIXELTYPE_FLOAT; // pixel type of input image
-        header.requested_pixel_types[i] = TINYEXR_PIXELTYPE_HALF; // pixel type of output image to be stored in .EXR
+        header.requested_pixel_types[i] = TINYEXR_PIXELTYPE_FLOAT; // keep pixel type as float in output image
     }
 
     const char* err = nullptr;
@@ -86,28 +91,11 @@ int ImageEXR::rgba2exr(int W, int H, std::string outfilename, RGBA_pixel rgbaIma
     return 0;
 }
 
-void ImageEXR::ToneMap() {
-    if (imageToSave == nullptr) {
-        imageToSave = new RGBA_pixel[W * H];
-    }
-
-    for (int j = 0; j < H; j++) {
-        for (int i = 0; i < W; ++i) {
-            imageToSave[j * W + i].val[0] = (unsigned char)(std::min(1.f, imagePlane[j * W + i].R) * 255);
-            imageToSave[j * W + i].val[1] = (unsigned char)(std::min(1.f, imagePlane[j * W + i].G) * 255);
-            imageToSave[j * W + i].val[2] = (unsigned char)(std::min(1.f, imagePlane[j * W + i].B) * 255);
-            imageToSave[j * W + i].val[3] = 255; // Alpha channel
-        }
-    }
-}
-
 bool ImageEXR::Save(std::string filename) {
     if (W == 0 || H == 0) {
         std::cout << "ERROR: Image is empty\n";
         return false;
     }
-
-    ToneMap();
 
     return rgba2exr(W, H, filename, imageToSave) == 0;
 }
