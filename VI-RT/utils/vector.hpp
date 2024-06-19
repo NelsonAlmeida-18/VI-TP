@@ -137,6 +137,10 @@ public:
         const float XYZ[3]={X,Y,Z};
         return Point(XYZ[x], XYZ[y], XYZ[z]);
     }
+    Vector point2vec (Point p2) {
+        Vector v(p2.X-X, p2.Y-Y, p2.Z-Z);
+        return v;
+    }
 };
 
 #endif /* vector_hpp */

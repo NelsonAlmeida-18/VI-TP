@@ -1,0 +1,15 @@
+##Parallel result
+
+#primitives = 8 ; #lights = 10 ; #materials = 8 ;
+Samples per pixel: 16
+Number of threads: 8
+
+Rendering time = 12.544 secs
+
+## Sequential Result
+
+#primitives = 8 ; #lights = 10 ; #materials = 8 ;
+Samples per pixel: 16
+Number of threads: 1
+
+Rendering time = 63.479 secs

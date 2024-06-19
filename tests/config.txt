@@ -1,0 +1,25 @@
+Arquitetura:                        x86_64
+Modo(s) operacional da CPU:         32-bit, 64-bit
+Ordem dos bytes:                    Little Endian
+Address sizes:                      39 bits physical, 48 bits virtual
+CPU(s):                             8
+Lista de CPU(s) on-line:            0-7
+Thread(s) per núcleo:               2
+Núcleo(s) por soquete:              4
+Soquete(s):                         1
+Nó(s) de NUMA:                      1
+ID de fornecedor:                   GenuineIntel
+Família da CPU:                     6
+Modelo:                             126
+Nome do modelo:                     Intel(R) Core(TM) i5-1035G1 CPU @ 1.00GHz
+Step:                               5
+CPU MHz:                            2827.350
+CPU MHz máx.:                       3600,0000
+CPU MHz mín.:                       400,0000
+BogoMIPS:                           2380.80
+Virtualização:                      VT-x
+cache de L1d:                       192 KiB
+cache de L1i:                       128 KiB
+cache de L2:                        2 MiB
+cache de L3:                        6 MiB
+CPU(s) de nó0 NUMA:                 0-7

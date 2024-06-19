@@ -32,7 +32,10 @@ bool ImagePPM::Save (std::string filename) {
         return false;
     }
 
-    std::cout << "Saving image to " << filename << std::endl;
+
+    if (filename.substr(filename.length() - 4).compare(".ppm") != 0) {
+        filename += ".ppm";
+    }
 
     // convert from float to {0,1,..., 255}
     ToneMap();
@@ -45,16 +48,7 @@ bool ImagePPM::Save (std::string filename) {
         ofs.open(filename, std::ios::out | std::ios::binary);
         if (ofs.fail()) throw "Can't open file";
         ofs << "P6\n" << W << " " << H << "\n255\n";
-        // Fill the image with sinthetic data
-        // float test[W][H][3];
-        // for (int j = 0 ; j< H ; j++) {
-        //     for (int i = 0; i < W ; ++i) {
-        //         test[i][j][0] = (float)i/W;
-        //         test[i][j][1] = (float)j/H;
-        //         test[i][j][2] = 0.2;
-        //     }
-        // }
-        // // Write the image to the file
+ 
         for (int j = 0 ; j< H ; j++) {
             for (int i = 0; i < W ; ++i) {
                 ofs << imageToSave[j*W+i].val[0];
@@ -66,6 +60,7 @@ bool ImagePPM::Save (std::string filename) {
 
         // ofs.write(reinterpret_cast<char*>(test), W*H*sizeof(PPM_pixel));
         ofs.close();
+        std::cout << "Image saved to "<< filename <<"\n";
     }
     catch (std::ofstream::failure e) {
         std::cout << "Exception opening/reading file\n";

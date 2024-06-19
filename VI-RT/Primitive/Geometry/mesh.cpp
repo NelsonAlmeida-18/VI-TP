@@ -127,6 +127,6 @@ bool Mesh::intersect (Ray r, Intersection *isect) {
             
         }
     }
-
+    *isect = min_isect;
     return intersect;
 }

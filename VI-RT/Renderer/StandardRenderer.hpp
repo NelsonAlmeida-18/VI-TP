@@ -14,12 +14,17 @@ class StandardRenderer: public Renderer {
 private:
     int spp;
     int jitter = 0;
+    int parallel = 0;
+    int interactiveOutput=0;
 public:
-    StandardRenderer (Camera *cam, Scene * scene, Image * img, Shader *shd, int _spp, int _jitter): Renderer(cam, scene, img, shd) {
+    StandardRenderer (Camera *cam, Scene * scene, Image * img, Shader *shd, int _spp, int _jitter, int _parallel, int _interactiveOutput): Renderer(cam, scene, img, shd) {
         spp = _spp;
         jitter = _jitter;
+        parallel = _parallel;
+        interactiveOutput = _interactiveOutput;
     }
-    void Render ();
+    int Render ();
+    void paralelRender(int numThreads, int W, int H, int spp, int jitter);
 };
 
 #endif /* StandardRenderer_hpp */
