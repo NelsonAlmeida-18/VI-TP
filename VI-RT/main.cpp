@@ -59,9 +59,9 @@ int main(int argc, const char * argv[]) {
     double cpu_time_used;
     
     int parallel = 1;
-    int interactiveOutut=0;
+    int interactiveOutut=1;
     // declare the renderer
-    int spp=2048;     // samples per pixel
+    int spp=16;     // samples per pixel
     int jitter=1;
 
 
@@ -71,10 +71,10 @@ int main(int argc, const char * argv[]) {
     const int H= 640;
     
 
-    // ImagePPM *img = new ImagePPM(W,H);
+    ImagePPM *img = new ImagePPM(W,H);
     // ImageJPG *img = new ImageJPG(W,H);
     // ImageEXR *img = new ImageEXR(W,H);
-    ImagePFM *img = new ImagePFM(W,H);
+    // ImagePFM *img = new ImagePFM(W,H);
     
     
     if (argc>1) {
@@ -143,7 +143,7 @@ int main(int argc, const char * argv[]) {
     createAreaLight(scene, Point(278.0, 548.0, 279.5), width, areaLightColor);
 
     double offset = 160.0;
-    areaLightColor = RGB(0.25, 0.25, 0.25);
+    areaLightColor = RGB(0.12, 0.12, 0.12);
     // createAreaLight(scene, Point(278.0 + offset, 548.0, 279.5+offset), width, areaLightColor);
     // createAreaLight(scene, Point(278.0 - offset, 548.0, 279.5-offset), width, areaLightColor);
     // createAreaLight(scene, Point(278.0-offset, 548.0, 279.5 + offset), width, areaLightColor);

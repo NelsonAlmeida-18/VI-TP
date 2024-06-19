@@ -20,9 +20,7 @@
 #include <stdio.h>
 #include <unordered_map>
 
-#ifndef _OPENMP
-    #include <omp.h>
-#endif
+#include <omp.h>
 
 using namespace tinyobj;
 
@@ -102,6 +100,8 @@ bool Scene::LoadObj(const std::string& fname) {
 
     // Each shape is one mesh
     // Lets iterate over shapes/meshes
+    int num_threads = omp_get_max_threads();
+    #pragma omp parallel for num_threads(num_threads)
     for (auto shape : shapes) {
 
         auto mat = &materials[shape.mesh.material_ids[0]];
@@ -197,13 +197,23 @@ bool Scene::LoadObj(const std::string& fname) {
             indexOffset += numVerticesPerFace;
         }
 
-        // Add primitives to the scene
-        prims.push_back(prim);
-        numPrimitives++;
+        #pragma omp critical
+        {
+            // Add primitives to the scene
+            prims.push_back(prim);
+            numPrimitives++;
 
-        // Add materials to the scene
-        BRDFs.push_back(phong);
-        numBRDFs++;
+            // Add materials to the scene
+            BRDFs.push_back(phong);
+            numBRDFs++;
+        }
+        // // Add primitives to the scene
+        // prims.push_back(prim);
+        // numPrimitives++;
+
+        // // Add materials to the scene
+        // BRDFs.push_back(phong);
+        // numBRDFs++;
 
     }
 

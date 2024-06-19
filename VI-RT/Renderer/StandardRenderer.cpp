@@ -39,7 +39,7 @@ int StandardRenderer::Render() {
     RGB colors[W * H] = { RGB(0, 0, 0) };
 
     for (int ss = 0; ss < spp; ss++) {
-        std::cout << "Sample: " << ss << "\n";
+        // std::cout << "Sample: " << ss << "\n";
         // Main rendering loop: get primary rays from the camera until done
         for (int y = 0; y < H; y++) {  // loop over rows
             for (int x = 0; x < W; x++) { // loop over columns
@@ -113,7 +113,7 @@ void StandardRenderer::paralelRender(int numThreads, int W, int H, int spp, int 
         unsigned int seed = omp_get_thread_num();
 
         for (int ss = 0; ss < spp; ss++) {
-            std::cout << "Sample: " << ss << "\n";
+            // std::cout << "Sample: " << ss << "\n";
             #pragma omp parallel num_threads(numThreads) 
     {
             #pragma omp for schedule(dynamic)
